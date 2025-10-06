@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Registro de Produtos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            /* Estilos adicionados/modificados para centralizar a primeira página */
+            display: flex; /* Habilita o contexto flexível */
+            justify-content: center; /* Centraliza horizontalmente o conteúdo flexível (os .page) */
+            align-items: center; /* Centraliza verticalmente o conteúdo flexível (os .page) */
+            overflow-y: auto; /* Permite a rolagem se o conteúdo for maior que a tela */
+        }
+
+        .container {
+                /* max-width: 600px; - Removido para que o flexbox do .page.active faça a centralização se necessário, mas mantido para limitar o tamanho */
+            max-width: 600px;
+            /* margin: 0 auto; - Removido para que a centralização vertical e horizontal seja feita pelo flexbox do .page.active */
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+            /* Adicionei 'width: 100%' para garantir que ele respeite o max-width */
+            width: 100%; 
+        }
+
+        .table-container {
+            max-width: 1200px;
+        /* margin: 0 auto; - Mantido pois este não precisa de centralização vertical, apenas horizontal. */
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        input[type="text"]:read-only {
+            background-color: #f9f9f9;
+            color: #666;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #ccc;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .autocomplete-items div {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #f0f0f0;
+        }
+
+        input[type="submit"],
+        input[type="button"] {
+            width: 100%;
+            padding: 12px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background: #34495e;
+        }
+
+        input[type="submit"]:active,
+        input[type="button"]:active {
+            background: #1a252f;
+        }
+
+        .btn-secondary {
+            background: #7f8c8d;
+        }
+
+        .btn-secondary:hover {
+            background: #95a5a6;
+        }
+
+        .btn-danger {
+            background: #c0392b;
+        }
+
+        .btn-danger:hover {
+            background: #e74c3c;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #2ecc71;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .checkbox-cell {
+            width: 50px;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .button-group input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .page {
+            display: none;
+            /* Remove o padding padrão do body para evitar sobreposição */
+            padding: 0;
+        }
+
+        #tablePage.active {
+            display: block; /* Mude para 'block' para que o .table-container use margin: auto */
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 20px; /* Adiciona o padding que foi removido do body */
+            padding-bottom: 20px; /* Adiciona o padding que foi removido do body */
+        }
+
+        #mainPage.active {
+            display: flex; /* Mantém 'flex' para centralizar o .container */
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100%;
+            padding-top: 20px; 
+            padding-bottom: 20px; 
+        }
+
+        #mainPage .container {
+            margin: auto; /* Garante a centralização se o flexbox for usado */
+        }
+
+        /* Corrige o .table-container para centralização horizontal */
+        #tablePage .table-container {
+            margin: 0 auto;
+        }
+
+        .page.active {
+            display: flex; /* Faz com que a página ativa seja um contêiner flexível */
+            justify-content: center; /* Centraliza o conteúdo da página ativa (o .container ou .table-container) */
+            align-items: center; /* Centraliza verticalmente o conteúdo da página ativa */
+            width: 100%; /* Garante que a página ativa ocupe toda a largura */
+            min-height: 100%; /* Garante que a página ativa ocupe toda a altura dentro do body flex */
+        }
+
+        .date-display {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 25px;
+            padding: 12px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .product-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .barcode-container {
+            margin-top: 5px;
+        }
+
+        .barcode-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container, .table-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group input {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .container, .table-container {
+                padding: 20px;
+            }
+
+            /* Adiciona a centralização vertical no mobile também */
+            #mainPage.active {
+                padding: 20px; 
+            }
+
+            #tablePage.active {
+                padding: 20px 0; 
+            }
+        }
+
+        /* INÍCIO: REGRA PARA IMPRESSÃO - ESCONDE BOTÕES E COLUNA DE CHECKBOX */
+        @media print {
+            /* 1. Esconde o grupo de botões */
+            .button-group {
+                display: none;
+            }
+
+            /* 2. Esconde a célula do cabeçalho com a checkbox "selecionar todos" */
+            #selectAll {
+                display: none;
+            }
+
+            /* 3. Esconde a coluna de checkbox nas linhas da tabela (tbody) */
+            .checkbox-cell {
+                display: none;
+            }
+
+            /* * Estilos de impressão opcionais para melhorar a formatação 
+            * (mantidos da resposta anterior)
+            */
+            .table-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: none;
+                width: 100%;
+            }
+
+            .barcode-container svg {
+                width: 100%; 
+                max-width: 250px; 
+                height: auto;
+            }
+            
+            th, td {
+                color: #2c3e50;
+                padding: 8px 10px;
+                text-align: center;
+            }
+            
+            th {
+                background-color: #ccc !important;
+
+            }
+            
+            tr:nth-child(even) {
+                background-color: #f0f0f0 !important;
+            }
+        }
+/* FIM: REGRA PARA IMPRESSÃO */
+    </style>
+</head>
+<body>
+    <div id="mainPage" class="page active">
+        <div class="container">
+            <h1>Sistema de Registro de Produtos</h1>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Nome do Produto:</label>
+                    <input type="text" id="productName" autocomplete="off" required>
+                    <div id="autocompleteList" class="autocomplete-items"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="measureType">Tipo de Medida:</label>
+                    <input type="text" id="measureType" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantidade:</label>
+                    <input type="number" id="quantity" step="0.01" min="0.01" required>
+                </div>
+
+                <input type="submit" value="Adicionar Produto" id="btnAddProduct">
+                <input type="button" class="btn-secondary" value="Ver Tabela de Produtos" id="btnViewTable">
+            </form>
+        </div>
+    </div>
+
+    <div id="tablePage" class="page">
+        <div class="table-container">
+            <h1>Lista de Produtos Registrados</h1>
+            <div class="date-display" id="currentDate"></div>
+
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="selectAll"></th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            
+            <div class="button-group">
+                <input type="button" class="btn-success" value="Voltar" id="btnBack">
+                <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
+                <input type="button" class="btn-danger" value="Excluir Todos" id="btnDeleteAll">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { code: "0209632", name: "ABACATE AVOCADO KG", type: "KG" },
+            { code: "0067890", name: "ABACATE KG", type: "KG" },
+            { code: "0223706", name: "ABACAXI DESCASCADO/FATIADO KG", type: "KG" },
+            { code: "0023948", name: "ABACAXI PEROLA KG", type: "KG" },
+            { code: "0289672", name: "ABACAXI PROCESSADO KG", type: "KG" },
+            { code: "0030441", name: "ABACAXI UN", type: "UN" },
+            { code: "0289696", name: "ABIU 400G BJ", type: "UN" },
+            { code: "0248457", name: "ABOBORA BATA KG", type: "KG" },
+            { code: "0267502", name: "ABOBORA CAIPIRA KG", type: "KG" },
+            { code: "0066884", name: "ABOBORA D'AGUA MARIMBA KG", type: "KG" },
+            { code: "0340427", name: "ABOBOBA ITALIA FATIADA KG", type: "KG" },
+            { code: "0007782", name: "ABOBORA ITALIANA KG", type: "KG" },
+            { code: "0006738", name: "ABOBORA JACARE KG", type: "KG" },
+            { code: "0320647", name: "ABOBORA MARANHAO KG", type: "KG" },
+            { code: "0300062", name: "ABOBORA MARANHAO PROCESSADA KG", type: "KG" },
+            { code: "0910408", name: "ABOBORA MENINA 400G BJ", type: "UN" },
+            { code: "0067829", name: "ABOBORA MENINA KG", type: "KG" },
+            { code: "0206411", name: "ABOBORA MENINA DESCASCADA KG", type: "KG" },
+            { code: "0090247", name: "ABOBORA MOGANGA KG", type: "KG" },
+            { code: "0228049", name: "ABOBORA MORANGA JAP DESCASCADA KG", type: "KG" },
+            { code: "2717601", name: "ABOBORA MORANGA JAPONESA SC", type: "SC" },
+            { code: "0067850", name: "ABOBORA MORANGA JAPONESA KG", type: "KG" },
+            { code: "0119951", name: "ABOBORA MORANGA JAPONES 4 KG", type: "KG" },
+            { code: "0190643", name: "ABOBORA PAULISTA KG", type: "KG" },
+            { code: "0289176", name: "ABOBORA PESSEGO KG", type: "KG" },
+            { code: "0267520", name: "ABOBORA VERMELHA MINI KG", type: "KG" },
+            { code: "0328524", name: "ABOBRINHA JACAREZIHO REDONDA KG", type: "KG" },
+            { code: "0271500", name: "ACEROLA 300G BJ", type: "UN" },
+            { code: "0318808", name: "ACEROLA KG", type: "KG" },
+            { code: "0353449", name: "ACHACHAIRU KG", type: "KG" },
+            { code: "0000506", name: "AGUA COCO 500ML GF", type: "UN" },
+            { code: "0300162", name: "ALHO DEBULHADO KG", type: "KG" },
+            { code: "0289031", name: "ALHO DESCASCADO KG", type: "KG" },
+            { code: "0044438", name: "ALHO GRANEL KG", type: "KG" },
+            { code: "0262035", name: "ALHO ROXO 10KG CX", type: "CX" },
+            { code: "0246258", name: "ALHO SELECIONADO KG", type: "KG" },
+            { code: "0289962", name: "AMEIXA IMPORTADA BAND KG", type: "KG" },
+            { code: "0008178", name: "AMEIXA IMPORTADA KG", type: "KG" },
+            { code: "0095606", name: "AMEIXA NACIONAL KG", type: "KG" },
+            { code: "0236577", name: "AMENDOA TORRADA SALG KG", type: "KG" },
+            { code: "0359368", name: "AMORA FRUTA 250G", type: "UN" },
+            { code: "0341301", name: "AMORA KG", type: "KG" },
+            { code: "0005593", name: "ATEMOIA KG", type: "KG" },
+            { code: "0301442", name: "AVELA C/CASCA KG", type: "KG" },
+            { code: "0067195", name: "BANANA CATURA KG", type: "KG" },
+            { code: "0067201", name: "BANANA MACA KG", type: "KG" },
+            { code: "0227148", name: "BANANA MARMELO KG", type: "KG" },
+            { code: "0204097", name: "BANANA NANICA KG", type: "KG" },
+            { code: "0028394", name: "BANANA OURO KG", type: "KG" },
+            { code: "0067218", name: "BANANA PRATA KG", type: "KG" },
+            { code: "0299050", name: "BANANA PRATA ORGANICA KG", type: "KG" },
+            { code: "0006147", name: "BANANA TERRA KG", type: "KG" },
+            { code: "0079143", name: "BATATA ASTERIX KG", type: "KG" },
+            { code: "0308138", name: "BATATA BAROA KG", type: "KG" },
+            { code: "0078870", name: "BATATA BOLINHA KG", type: "KG" },
+            { code: "0290098", name: "BATATA DOCE BRANCA BAND KG", type: "KG" },
+            { code: "0037815", name: "BATATA DOCE BRANCA KG", type: "KG" },
+            { code: "0067232", name: "BATATA DOCE ROXA KG", type: "KG" },
+            { code: "0318259", name: "BATATA DOCE ROXA PROCESSADA KG", type: "KG" },
+            { code: "0008233", name: "BATATA ESCOVADA KG", type: "KG" },
+            { code: "1324446", name: "BATATA INGLESA 25KG SC", type: "SC" },
+            { code: "0067249", name: "BATATA INGLESA KG", type: "KG" },
+            { code: "0303404", name: "BATATA INGLESA LAVADA KG", type: "KG" },
+            { code: "0277419", name: "BATATA INGLESA PROCESSADA KG", type: "KG" },
+            { code: "0199677", name: "BATATA INGLESA ROXA KG", type: "KG" },
+            { code: "0078167", name: "BATATA INGLESA ROXA KG", type: "KG" },
+            { code: "0220197", name: "BATATA YACON BAND KG", type: "KG" },
+            { code: "0203784", name: "BATATA YACON KG", type: "KG" },
+            { code: "0007256", name: "BERINJELA KG", type: "KG" },
+            { code: "0290258", name: "BETERRABA BAND KG", type: "KG" },
+            { code: "0007263", name: "BETERRABA KG", type: "KG" },
+            { code: "0318208", name: "BETERRABA PROCESSADA KG", type: "KG" },
+            { code: "0040319", name: "CACAU KG", type: "KG" },
+            { code: "0006979", name: "CAJA MANGA KG", type: "KG" },
+            { code: "0035697", name: "CAJU KG", type: "KG" },
+            { code: "0353136", name: "CANA KG", type: "KG" },
+            { code: "0001014", name: "CAQUI FUIU KG", type: "KG" },
+            { code: "0230340", name: "CAQUI FUIU BAND KG", type: "KG" },
+            { code: "0290304", name: "CAQUI FUYU KG", type: "KG" },
+            { code: "0283990", name: "CAQUI RAMA FORTE KG", type: "KG" },
+            { code: "0287557", name: "CARA BARBADOS KG", type: "KG" },
+            { code: "0004985", name: "CARA KG", type: "KG" },
+            { code: "0271355", name: "CARA/INHAME BKG SC", type: "SC" },
+            { code: "0067331", name: "CARA/INHAME KG", type: "KG" },
+            { code: "0005111", name: "CARAMBOLA 300G BJ", type: "UN" },
+            { code: "0173626", name: "CARAMBOLA KG", type: "KG" },
+            { code: "0199858", name: "CARAZINHO DEDO/INHAME KG", type: "KG" },
+            { code: "0326987", name: "CARAZINHO RAIZ DO BEM C/CASCA K", type: "KG" },
+            { code: "0201759", name: "CASTANHA CAJU CARAMELADA KG", type: "KG" },
+            { code: "0269957", name: "CASTANHA CAJU KG", type: "KG" },
+            { code: "0269940", name: "CASTANHA PARA CASCA KG", type: "KG" },
+            { code: "0236874", name: "CASTANHA PORT KG", type: "KG" },
+            { code: "0269895", name: "CASTANHA PORT RAIZ DO BEM KG", type: "KG" },
+            { code: "0223799", name: "CATALONIA UN", type: "UN" },
+            { code: "0314442", name: "CEBOLA AMARELA 20KG SC", type: "SC" },
+            { code: "0067416", name: "CEBOLA AMARELA KG", type: "KG" },
+            { code: "0290425", name: "CEBOLA AMARELA MEDIA KG", type: "KG" },
+            { code: "0318215", name: "CEBOLA AMARELA PROCESSADA KG", type: "KG" },
+            { code: "0321211", name: "CEBOLA BCA PIRULITO KG", type: "KG" },
+            { code: "0290470", name: "CEBOLA BRANCA KG", type: "KG" },
+            { code: "0078211", name: "CEBOLA MIUDA KG", type: "KG" },
+            { code: "0290494", name: "CEBOLA ROXA BAND KG", type: "KG" },
+            { code: "0067430", name: "CEBOLA ROXA KG", type: "KG" },
+            { code: "0040523", name: "CENOURA BAROA BJ KG", type: "KG" },
+            { code: "0067447", name: "CENOURA BARCA KG", type: "KG" },
+            { code: "0003476", name: "CENOURA VERM PROCESSADA KG", type: "KG" },
+            { code: "0004916", name: "CENOURA VERMELHA BJ", type: "BJ" },
+            { code: "0067454", name: "CENOURA VERMELHA KG", type: "KG" },
+            { code: "0100113", name: "CEREJA IN NATURA 200G PT", type: "PT" },
+            { code: "0236904", name: "CEREJA IN NATURA KG", type: "KG" },
+            { code: "0370370", name: "CEREJA", type: "KG" },
+            { code: "0067492", name: "CHUCHU KG", type: "KG" },
+            { code: "0285163", name: "CHUCHU PROCESSADO KG", type: "KG" },
+            { code: "0329200", name: "CHUCHU VENTO KG", type: "KG" },
+            { code: "0067508", name: "COCO SECO KG", type: "KG" },
+            { code: "0290562", name: "COCO SECO PROCESS.KG", type: "KG" },
+            { code: "0290579", name: "COCO SECO QUEBRADO KG", type: "KG" },
+            { code: "0030526", name: "COCO VERDE UN", type: "UN" },
+            { code: "0003780", name: "COUVE FLOR UN", type: "UN" },
+            { code: "0293839", name: "CUPUACU KG", type: "KG" },
+            { code: "0070698", name: "DAMASCO SECO KG", type: "KG" },
+            { code: "0308708", name: "ERVILHA KG EMBALADA", type: "KG" },
+            { code: "0003946", name: "ERVILHA TORTA 200G BJ", type: "UN" },
+            { code: "0344713", name: "ESPAGUETE C/BROCOLIS KG", type: "KG" },
+            { code: "0100266", name: "FIGO ROXO 300G BJ", type: "UN" },
+            { code: "0290654", name: "FIGO ROXO KG", type: "KG" },
+            { code: "0008100", name: "FIGO VERDE KG", type: "KG" },
+            { code: "0341318", name: "FRUTA PAO KG", type: "KG" },
+            { code: "0044978", name: "GENGIBRE BJ KG", type: "KG" },
+            { code: "0001151", name: "GENGIBRE KG", type: "KG" },
+            { code: "0001175", name: "GOIABA BRANCA KG", type: "KG" },
+            { code: "0314613", name: "GOIABA VERM. SELECIONADA KG", type: "KG" },
+            { code: "0335874", name: "GOIABA VERM PROCESSADA KG", type: "KG" },
+            { code: "0003126", name: "GOIABA VERMELHA KG", type: "KG" },
+            { code: "0203777", name: "GRAVIOLA KG", type: "KG" },
+            { code: "0004580", name: "GRAVIOLA KG", type: "KG" },
+            { code: "0325897", name: "H UVA ROSADA NIAGARA 500G BDJ", type: "UN" },
+            { code: "1541486", name: "HORTELA ROXA UN", type: "UN" },
+            { code: "0188766", name: "INHAME KG", type: "KG" },
+            { code: "0373326", name: "INS ABACAXI Kg", type: "KG" },
+            { code: "0344266", name: "INS ALHO KG", type: "KG" },
+            { code: "0373234", name: "INS CEBOLA Kg", type: "KG" },
+            { code: "3424889", name: "INS FRUTAS CRIST KG", type: "KG" },
+            { code: "0345364", name: "INS MANDIOCA KG", type: "KG" },
+            { code: "3427194", name: "INS MILHO VERDE KG", type: "KG" },
+            { code: "0373210", name: "INS TOMATE Kg", type: "KG" },
+            { code: "0290739", name: "JABUTICABA KG", type: "KG" },
+            { code: "0329763", name: "JACA KG", type: "KG" },
+            { code: "0290777", name: "JAMBO ROSA KG", type: "KG" },
+            { code: "0280791", name: "JENIPARO KG", type: "KG" },
+            { code: "0001250", name: "JILO KG", type: "KG" },
+            { code: "0335867", name: "KIT ESPAGUETE LEGUMES ESK KG", type: "KG" },
+            { code: "0335850", name: "KIT ESPAGUETE LEGUMES KG", type: "KG" },
+            { code: "0335836", name: "KIT SALADA MAION KG", type: "KG" },
+            { code: "0316026", name: "KIT VERDURAS P/ SALADAS KG", type: "KG" },
+            { code: "0311300", name: "KIT VERDURAS P/SALADAS 2 KG", type: "KG" },
+            { code: "0314106", name: "KIT VERDURAS P/SALADAS 3 KG", type: "KG" },
+            { code: "0335843", name: "KIT YAKISOBA KG", type: "KG" },
+            { code: "0290838", name: "KIWI AMARELO SUN GOLD KG", type: "KG" },
+            { code: "0005135", name: "KIWI BJ KG", type: "KG" },
+            { code: "0001274", name: "KIWI IMPORTADO KG", type: "KG" },
+            { code: "0179310", name: "KIWI NACIONAL KG", type: "KG" },
+            { code: "0355260", name: "LARANJA BAHIA IMPORTADA KG", type: "KG" },
+            { code: "0001366", name: "LARANJA BAHIA KG", type: "KG" },
+            { code: "0320803", name: "LARANJA DESIDRATADA KG", type: "KG" },
+            { code: "0300883", name: "LARANJA GRAP FRUIT KG", type: "KG" },
+            { code: "0209656", name: "LARANJA KINKAN KG", type: "KG" },
+            { code: "0280913", name: "LARANJA LIMA KG", type: "KG" },
+            { code: "0264453", name: "LARANJA LIMA PERSIA KG", type: "KG" },
+            { code: "0344107", name: "LARANJA PERA RIO 20KG SC", type: "SC" },
+            { code: "0001373", name: "LARANJA PERA RIO KG", type: "KG" },
+            { code: "0000798", name: "LARANJA SELECTA KG", type: "KG" },
+            { code: "0001380", name: "LARANJA SERRA D'AGUA KG", type: "KG" },
+            { code: "0336192", name: "LARANJA VALENCIA IMPORTADA KG", type: "KG" },
+            { code: "0344439", name: "LICHIA 400G BJ", type: "UN" },
+            { code: "0362184", name: "LICHIA BRANCA KG", type: "KG" },
+            { code: "0056045", name: "LICHIA KG", type: "KG" },
+            { code: "0280936", name: "LIMAO 10 KG SC", type: "SC" },
+            { code: "0314114", name: "LIMAO 20KG SC", type: "SC" },
+            { code: "1359986", name: "LIMAO CRAVO KG", type: "KG" },
+            { code: "0290975", name: "LIMAO GALEGO KG", type: "KG" },
+            { code: "0001397", name: "LIMAO KG", type: "KG" },
+            { code: "0023716", name: "LIMAO SICILIANO KG", type: "KG" },
+            { code: "0220287", name: "LIMAO TAHITI KG", type: "KG" },
+            { code: "0234246", name: "LOURO UN", type: "UN" },
+            { code: "0081885", name: "MACA ARGENTINA/CHILENA KG", type: "KG" },
+            { code: "0291071", name: "MACA EMBALADA KG", type: "KG" },
+            { code: "0291019", name: "MACA FUJI BAND KG", type: "KG" },
+            { code: "0068158", name: "MACA FUJI GRAN SMITH KG", type: "KG" },
+            { code: "0291085", name: "MACA IMPORTADA GALA KG", type: "KG" },
+            { code: "0291179", name: "MACA IMPORTADA KG", type: "KG" },
+            { code: "0001908", name: "MACA NACIONAL FUJI KG", type: "KG" },
+            { code: "0001915", name: "MACA NACIONAL GALA KG", type: "KG" },
+            { code: "0001892", name: "MACA NACIONAL GOLDEN KG", type: "KG" },
+            { code: "0278477", name: "MACA PINK LADY KG", type: "KG" },
+            { code: "0001939", name: "MAMAO FORMOSO KG", type: "KG" },
+            { code: "0300218", name: "MAMAO FORMOSO PROCESSADO KG", type: "KG" },
+            { code: "0001946", name: "MAMAO HAVAI KG", type: "KG" },
+            { code: "0293217", name: "MAMAO HAVAI PROCESSADO KG", type: "KG" },
+            { code: "1845601", name: "MANDIOCA EMBALADA DESC.1KG PT", type: "PT" },
+            { code: "0010400", name: "MANDIOCA KG", type: "KG" },
+            { code: "0045347", name: "MANGA ESPADA KG", type: "KG" },
+            { code: "0079732", name: "MANGA HADEM KG", type: "KG" },
+            { code: "0008761", name: "MANGA PALMER KG", type: "KG" },
+            { code: "0291316", name: "MANGA PALMER PROCESSADA KG", type: "KG" },
+            { code: "0291361", name: "MANGA ROSA KG", type: "KG" },
+            { code: "0019777", name: "MANGA TOMY KG", type: "KG" },
+            { code: "0291323", name: "MANGA TOMY PROCESSADA KG", type: "KG" },
+            { code: "0101222", name: "MANGA UBA KG", type: "KG" },
+            { code: "0100595", name: "MANGOSTIN KG", type: "KG" },
+            { code: "0316842", name: "MANGUTIA KG", type: "KG" },
+            { code: "0001984", name: "MARACUJA AZEDO KG", type: "KG" },
+            { code: "0001991", name: "MARACUJA DOCE KG", type: "KG" },
+            { code: "0054886", name: "MARACUJA KG", type: "KG" },
+            { code: "0363303", name: "MARMELO KG", type: "KG" },
+            { code: "0202034", name: "MAXIXE KG", type: "KG" },
+            { code: "0291491", name: "MELANCIA AMARELA KG", type: "KG" },
+            { code: "0809092", name: "MELANCIA BABY KG", type: "KG" },
+            { code: "0002011", name: "MELANCIA KG", type: "KG" },
+            { code: "0272087", name: "MELANCIA PINGO DOCE KG", type: "KG" },
+            { code: "0300292", name: "MELANCIA PINGO DOCE PROCESSADO KG", type: "KG" },
+            { code: "0300285", name: "MELANCIA PROCESSADA KG", type: "KG" },
+            { code: "0291613", name: "MELAO AMARELO CEPI KG", type: "KG" },
+            { code: "0002020", name: "MELAO AMARELO KG", type: "KG" },
+            { code: "0300239", name: "MELAO AMARELO PROCESSADO KG", type: "KG" },
+            { code: "0291668", name: "MELAO ANDINO KG", type: "KG" },
+            { code: "0291682", name: "MELAO CANTALOUP KG", type: "KG" },
+            { code: "0291712", name: "MELAO CHARENTE KG", type: "KG" },
+            { code: "0329217", name: "MELAO DINO KG", type: "KG" },
+            { code: "0270830", name: "MELAO DOCE KG", type: "KG" },
+            { code: "0013765", name: "MELAO ESPANHOL KG", type: "KG" },
+            { code: "0209761", name: "MELAO GALIA KG", type: "KG" },
+            { code: "0359962", name: "MELAO MAISA KG", type: "KG" },
+            { code: "0275484", name: "MELAO NET MELON KG", type: "KG" },
+            { code: "0014540", name: "MELAO ORANGE KG", type: "KG" },
+            { code: "0025179", name: "MELAO PELE DE SAPO CEPI KG", type: "KG" },
+            { code: "0643269", name: "MELAO PELE SAPO KG", type: "KG" },
+            { code: "0291750", name: "MELAO PROCESSADO KG", type: "KG" },
+            { code: "0291775", name: "MELAO REDEI.KG", type: "KG" },
+            { code: "0291686", name: "MELAO REDEI.CEPI KG", type: "KG" },
+            { code: "0042496", name: "MEXERICA BERGAMOTA KG", type: "KG" },
+            { code: "0085033", name: "MEXERICA CARIOCA KG", type: "KG" },
+            { code: "0226367", name: "MEXERICA DECOPON KG", type: "KG" },
+            { code: "0336215", name: "MEXERICA IMPORTADA KG", type: "KG" },
+            { code: "0046106", name: "MEXERICA MURCOTE KG", type: "KG" },
+            { code: "0000428", name: "PINHA KG", type: "KG" },
+            { code: "0258623", name: "PINHAO KG", type: "KG" },
+            { code: "0256643", name: "PITAIA KG", type: "KG" },
+            { code: "0292566", name: "PITANGA BAND KG", type: "KG" },
+            { code: "0292580", name: "PITAVA VERMELHA KG", type: "KG" },
+            { code: "0227836", name: "POLPA FRUTA MARACUJA KG", type: "KG" },
+            { code: "0010240", name: "QUIABO 300G BJ", type: "UN" },
+            { code: "0296098", name: "QUIABO 300G BJ", type: "UN" },
+            { code: "0000315", name: "QUIABO KG", type: "KG" },
+            { code: "0335799", name: "RABANETE KG", type: "KG" },
+            { code: "0292597", name: "RAMBUTAN KG", type: "KG" },
+            { code: "0003580", name: "REPOLHO ROXO KG", type: "KG" },
+            { code: "0282603", name: "REPOLHO ROXO PROCESSADO KG", type: "KG" },
+            { code: "0003583", name: "REPOLHO VERDE KG", type: "KG" },
+            { code: "0292610", name: "REPOLHO VERDE PROCESSADO KG", type: "KG" },
+            { code: "0018425", name: "ROMA KG", type: "KG" },
+            { code: "0341420", name: "SALADA F P KG CRUA", type: "KG" },
+            { code: "0300083", name: "SALADA FRUTAS ESPECIAL KG", type: "KG" },
+            { code: "0292627", name: "SALADA FRUTAS KG", type: "KG" },
+            { code: "0020966", name: "SAPOTI KG", type: "KG" },
+            { code: "0001427", name: "SELETA LEGUMES KG", type: "KG" },
+            { code: "0292672", name: "SERIGUELA KG", type: "KG" },
+            { code: "0300490", name: "SUCO NATURAL LARANJA 500ML GF", type: "UN" },
+            { code: "0292699", name: "TAMARA KG", type: "KG" },
+            { code: "0296702", name: "TAMARINDO KG", type: "KG" },
+            { code: "0362986", name: "TANGERINA CRAVO KG", type: "KG" },
+            { code: "0309912", name: "TANGERINA IMPORTADA KG", type: "KG" },
+            { code: "0079950", name: "TANGERINA MURCOTE KG", type: "KG" },
+            { code: "0289074", name: "TANGERINA PONKAN KG", type: "KG" },
+            { code: "0026510", name: "PEQUI 300G BJ", type: "UN" },
+            
+            { code: "0002448", name: "PEPINO COMUM KG", type: "KG" },
+            { code: "0291996", name: "PEPINO JAPONES KG", type: "KG" },
+            { code: "0026510", name: "PERA 1KG BJ", type: "UN" },
+            { code: "0017590", name: "PERA ASIATICA KG", type: "KG" },
+            { code: "0292092", name: "PERA COSCIA KG", type: "KG" },
+            { code: "0072916", name: "PERA D'ANJOU KG", type: "KG" },
+            { code: "0309512", name: "PERA DANJOU 600G", type: "UN" },
+            { code: "0270309", name: "PERA ERCOLINI KG", type: "KG" },
+            { code: "0244305", name: "PERA FORELLES KG", type: "KG" },
+            { code: "0022153", name: "PERA IMPORTADA KG", type: "KG" },
+            { code: "0002462", name: "PERA KG", type: "KG" },
+            { code: "0018043", name: "PERA PORTUGUESA KG", type: "KG" },
+            { code: "0041264", name: "PERA PT KG", type: "KG" },
+            { code: "0018302", name: "PERA RED KG", type: "KG" },
+            { code: "0167215", name: "PERA WILLIAMS KG", type: "KG" },
+            { code: "0005258", name: "PESSEGO IMPORTADO KG", type: "KG" },
+            { code: "0003773", name: "PESSEGO NACIONAL KG", type: "KG" },
+            { code: "0255582", name: "PIMENTA AMERICANA KG", type: "KG" },
+            { code: "0341653", name: "PIMENTA BIQUINHO KG", type: "KG" },
+            { code: "0184816", name: "PIMENTA CAMBUCI 300G BJ", type: "UN" },
+            { code: "0064233", name: "PIMENTA CAMBUCI KG", type: "KG" },
+            { code: "0064275", name: "PIMENTA DEDO MOCA KG", type: "KG" },
+            { code: "0292375", name: "PIMENTA MALAGUETA KG", type: "KG" },
+            { code: "0064226", name: "PIMENTAO AMARELO KG", type: "KG" },
+            { code: "0190933", name: "PIMENTAO AMARELO/VERDE KG", type: "KG" },
+            { code: "0292436", name: "PIMENTAO CREME KG", type: "KG" },
+            { code: "0292481", name: "PIMENTAO MISTO KG", type: "KG" },
+            { code: "0292504", name: "PIMENTAO MISTO PROCESSADO KG", type: "KG" },
+            { code: "0299613", name: "PIMENTAO PALERMO KG", type: "KG" },
+            { code: "0002539", name: "PIMENTAO VERDE KG", type: "KG" },
+            { code: "0242542", name: "PIMENTAO VERDE PROCESSADO KG", type: "KG" },
+            { code: "0002547", name: "PIMENTAO VERMELHO KG", type: "KG" },
+            { code: "0270830", name: "TOMATE CAQUI KG", type: "KG" },
+            { code: "0345124", name: "TOMATE CEREJA BJ", type: "UN" },
+            { code: "0317030", name: "TOMATE CEREJA KG", type: "KG" },
+            { code: "3335396", name: "TOMATE HOLANDES 120G", type: "UN" },
+            { code: "0335881", name: "TOMATE HOLANDES KG", type: "KG" },
+            { code: "0071314", name: "TOMATE ITALIANO ANDREA KG", type: "KG" },
+            { code: "0292736", name: "TOMATE ITALIANO KG", type: "KG" },
+            { code: "0064248", name: "TOMATE LONGA VIDA KG", type: "KG" },
+            { code: "0003598", name: "TOMATE MACA KG", type: "KG" },
+            { code: "0292795", name: "TOMATE SWEET GRAPE KG", type: "KG" },
+            { code: "0279475", name: "UVA BENITAKA KG", type: "KG" },
+            { code: "0638005", name: "UVA CRIMSON 500G BJ", type: "UN" },
+            { code: "0827768", name: "UVA CRIMSON KG", type: "KG" },
+            { code: "0115591", name: "UVA CRIMSON S/SEMENTE 500G BJ", type: "UN" },
+            { code: "0360036", name: "UVA ISIS KG", type: "KG" },
+            { code: "0003650", name: "UVA ITALIA KG", type: "KG" },
+            { code: "0362391", name: "UVA JUBILE KG", type: "KG" },
+            { code: "0616041", name: "UVA MOSCATEL KG", type: "KG" },
+            { code: "0003667", name: "UVA PASSA BRANCA S/S KG", type: "KG" },
+            { code: "0363075", name: "UVA PASSAS BRANCA KG", type: "KG" },
+            { code: "0364775", name: "UVA PASSAS ESC POTE KG", type: "KG" },
+            { code: "0362788", name: "UVA PASSAS PRETA S/CAR GRANEL", type: "KG" },
+            { code: "0364508", name: "UVA PASSAS PTA S KG", type: "KG" },
+            { code: "0363202", name: "UVA RED GLOBE KG", type: "KG" },
+            { code: "2361118", name: "UVA ROSADA 500G BJ", type: "UN" },
+            { code: "0064408", name: "UVA ROSADA KG", type: "KG" },
+            { code: "0366090", name: "UVA ROSADA NIAGARA CX PEQ UN", type: "UN" },
+            { code: "0003674", name: "UVA RUBI KG", type: "KG" },
+            { code: "0005357", name: "UVA THOMPSON KG", type: "KG" },
+            { code: "0359542", name: "UVA THOMPSON S/CAROCO 500 GR", type: "UN" },
+            { code: "0292900", name: "UVA VITORIA KG", type: "KG" },
+            { code: "0184687", name: "VAGEM 300G BJ", type: "UN" },
+            { code: "0003681", name: "VAGEM KG", type: "KG" },
+            { code: "0227032", name: "VAGEM MANTEIGA KG", type: "KG" },
+            { code: "2961161", name: "VAGEM RASTEIRA BAND 200G", type: "UN" },
+            { code: "0001199", name: "VINAGRETE KG", type: "KG" }
+        ];
+
+        let allProducts = products.map(p => p.name).sort();
+        let productData = {};
+
+        const productInput = document.getElementById('productName');
+        const autocompleteList = document.getElementById('autocompleteList');
+        const measureType = document.getElementById('measureType');
+
+        // --- NOVAS FUNÇÕES PARA LOCALSTORAGE ---
+        function saveProducts() {
+            // Converte o objeto de dados para string JSON e salva no localStorage
+            localStorage.setItem('registeredProducts', JSON.stringify(productData));
+        }
+
+        function loadProducts() {
+            // Tenta buscar os dados salvos
+            const savedData = localStorage.getItem('registeredProducts');
+            if (savedData) {
+                // Se houver dados, parseia a string JSON de volta para objeto e carrega em productData
+                productData = JSON.parse(savedData);
+            } else {
+                // Se não houver dados, inicializa como objeto vazio
+                productData = {};
+            }
+        }
+
+        productInput.addEventListener('input', function() {
+            const value = this.value.toLowerCase();
+            autocompleteList.innerHTML = '';
+            
+            if (!value) {
+                measureType.value = '';
+                return;
+            }
+
+            const filtered = allProducts.filter(p => 
+                p.toLowerCase().includes(value)
+            );
+
+            filtered.forEach(productName => {
+                const div = document.createElement('div');
+                div.textContent = productName;
+                div.addEventListener('click', function() {
+                    productInput.value = productName;
+                    autocompleteList.innerHTML = '';
+                    updateMeasureType(productName);
+                });
+                autocompleteList.appendChild(div);
+            });
+        });
+
+        function updateMeasureType(productName) {
+            const product = products.find(p => p.name === productName);
+            if (product) {
+                measureType.value = product.type;
+            } else {
+                measureType.value = '';
+            }
+        }
+
+        function getProductCode(productName) {
+            const product = products.find(p => p.name === productName);
+            return product ? product.code : 'NOCODE000000';
+        }
+
+        function addProduct(e) {
+            if (e) e.preventDefault();
+            
+            const name = productInput.value.trim();
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const type = measureType.value;
+
+            if (!name || !quantity || !type) {
+                alert('Por favor, preencha todos os campos!');
+                return false;
+            }
+
+            if (productData[name]) {
+                productData[name].quantity += quantity;
+            } else {
+                productData[name] = {
+                    name: name,
+                    type: type,
+                    quantity: quantity
+                };
+            }
+            
+            productInput.value = '';
+            document.getElementById('quantity').value = '';
+            measureType.value = '';
+            
+            alert('Produto adicionado com sucesso!');
+            return false;
+        }
+
+        document.getElementById('productForm').addEventListener('submit', addProduct);
+        
+        document.querySelector('input[type="submit"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            addProduct(e);
+        });
+
+        document.getElementById('btnViewTable').addEventListener('click', function() {
+            showTablePage();
+        });
+
+        document.getElementById('btnBack').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Botão Voltar clicado');
+            showMainPage();
+        });
+
+        document.getElementById('btnDeleteSelected').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Botão Excluir Selecionados clicado');
+            deleteSelected();
+        });
+
+        document.getElementById('btnDeleteAll').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Botão Excluir Todos clicado');
+            deleteAll();
+        });
+
+        document.getElementById('selectAll').addEventListener('click', function() {
+            toggleSelectAll();
+        });
+
+        function showTablePage() {
+            document.getElementById('mainPage').classList.remove('active');
+            document.getElementById('tablePage').classList.add('active');
+            updateTable();
+            updateDate();
+        }
+
+        function showMainPage() {
+            document.getElementById('tablePage').classList.remove('active');
+            document.getElementById('mainPage').classList.add('active');
+        }
+
+        function updateDate() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        function generateBarcode(productName) {
+            return getProductCode(productName);
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (Object.keys(productData).length === 0) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.textContent = 'Nenhum produto registrado';
+                cell.style.textAlign = 'center';
+                cell.style.padding = '20px';
+                cell.style.color = '#999';
+                return;
+            }
+
+            Object.values(productData).forEach(product => {
+                const row = tbody.insertRow();
+                
+                const cellCheck = row.insertCell(0);
+                cellCheck.className = 'checkbox-cell';
+                cellCheck.innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${product.name}">`;
+                
+                const cellProduct = row.insertCell(1);
+                const barcodeId = 'barcode-' + product.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                cellProduct.innerHTML = `
+                    <div class="product-cell">
+                        <span class="product-name">${product.name}</span>
+                        <div class="barcode-container">
+                            <svg id="${barcodeId}"></svg>
+                        </div>
+                    </div>
+                `;
+                
+                const cellType = row.insertCell(2);
+                cellType.textContent = product.type;
+                
+                const cellQuantity = row.insertCell(3);
+                cellQuantity.textContent = product.quantity.toFixed(2);
+
+                setTimeout(() => {
+                    try {
+                        JsBarcode(`#${barcodeId}`, generateBarcode(product.name), {
+                            format: "CODE128",
+                            width: 1,
+                            height: 40,
+                            displayValue: true,
+                            fontSize: 10,
+                            margin: 2
+                        });
+                    } catch (e) {
+                        console.error('Erro ao gerar código de barras:', e);
+                    }
+                }, 100);
+            });
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        function deleteSelected() {
+            console.log('Função deleteSelected chamada');
+            console.log('Dados atuais:', productData);
+            
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            console.log('Checkboxes selecionados:', checkboxes.length);
+            
+            if (checkboxes.length === 0) {
+                alert('Selecione pelo menos um produto para excluir!');
+                return;
+            }
+
+            if (confirm(`Deseja excluir ${checkboxes.length} produto(s)?`)) {
+                checkboxes.forEach(cb => {
+                    const productName = cb.getAttribute('data-product');
+                    console.log('Excluindo produto:', productName);
+                    delete productData[productName];
+                });
+                console.log('Dados após exclusão:', productData);
+                updateTable();
+                document.getElementById('selectAll').checked = false;
+                alert('Produtos excluídos com sucesso!');
+            }
+        }
+
+        function deleteAll() {
+            console.log('Função deleteAll chamada');
+            console.log('Dados atuais:', productData);
+            
+            const productCount = Object.keys(productData).length;
+            console.log('Total de produtos:', productCount);
+            
+            if (productCount === 0) {
+                alert('Não há produtos para excluir!');
+                return;
+            }
+
+            if (confirm(`Deseja excluir TODOS os ${productCount} produto(s)?`)) {
+                productData = {};
+                console.log('Todos os produtos excluídos');
+                updateTable();
+                document.getElementById('selectAll').checked = false;
+                alert('Todos os produtos foram excluídos!');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target !== productInput) {
+                autocompleteList.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>
