@@ -813,6 +813,8 @@
             }
         }
 
+        loadProducts(); // Carrega os produtos salvos ao iniciar a página
+
         productInput.addEventListener('input', function() {
             const value = this.value.toLowerCase();
             autocompleteList.innerHTML = '';
@@ -874,6 +876,8 @@
                 };
             }
             
+            saveProducts(); // Salva os dados atualizados no localStorage
+
             productInput.value = '';
             document.getElementById('quantity').value = '';
             measureType.value = '';
@@ -1005,11 +1009,7 @@
         }
 
         function deleteSelected() {
-            console.log('Função deleteSelected chamada');
-            console.log('Dados atuais:', productData);
-            
             const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            console.log('Checkboxes selecionados:', checkboxes.length);
             
             if (checkboxes.length === 0) {
                 alert('Selecione pelo menos um produto para excluir!');
@@ -1019,10 +1019,12 @@
             if (confirm(`Deseja excluir ${checkboxes.length} produto(s)?`)) {
                 checkboxes.forEach(cb => {
                     const productName = cb.getAttribute('data-product');
-                    console.log('Excluindo produto:', productName);
                     delete productData[productName];
                 });
-                console.log('Dados após exclusão:', productData);
+                
+                // SALVA OS DADOS APÓS EXCLUIR
+                saveProducts(); // <--- DEVE ESTAR AQUI
+                
                 updateTable();
                 document.getElementById('selectAll').checked = false;
                 alert('Produtos excluídos com sucesso!');
@@ -1030,11 +1032,7 @@
         }
 
         function deleteAll() {
-            console.log('Função deleteAll chamada');
-            console.log('Dados atuais:', productData);
-            
             const productCount = Object.keys(productData).length;
-            console.log('Total de produtos:', productCount);
             
             if (productCount === 0) {
                 alert('Não há produtos para excluir!');
@@ -1043,7 +1041,10 @@
 
             if (confirm(`Deseja excluir TODOS os ${productCount} produto(s)?`)) {
                 productData = {};
-                console.log('Todos os produtos excluídos');
+                
+                // SALVA OS DADOS APÓS EXCLUIR TODOS
+                saveProducts(); // <--- DEVE ESTAR AQUI
+
                 updateTable();
                 document.getElementById('selectAll').checked = false;
                 alert('Todos os produtos foram excluídos!');
