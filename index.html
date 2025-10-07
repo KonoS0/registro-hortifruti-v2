@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Registro de Produtos</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
     <style>
+        /* Estilização original completa foi mantida aqui */
         * {
             margin: 0;
             padding: 0;
@@ -18,36 +18,20 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
-            /* Estilos adicionados/modificados para centralizar a primeira página */
-            display: flex; /* Habilita o contexto flexível */
-            justify-content: center; /* Centraliza horizontalmente o conteúdo flexível (os .page) */
-            align-items: center; /* Centraliza verticalmente o conteúdo flexível (os .page) */
-            overflow-y: auto; /* Permite a rolagem se o conteúdo for maior que a tela */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
         }
 
         .container {
-                /* max-width: 600px; - Removido para que o flexbox do .page.active faça a centralização se necessário, mas mantido para limitar o tamanho */
             max-width: 600px;
-            /* margin: 0 auto; - Removido para que a centralização vertical e horizontal seja feita pelo flexbox do .page.active */
             background: white;
             border-radius: 8px;
             padding: 40px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid #e0e0e0;
-            /* Adicionei 'width: 100%' para garantir que ele respeite o max-width */
             width: 100%; 
-        }
-
-        .table-container {
-            max-width: 1200px;
-        /* margin: 0 auto; - Mantido pois este não precisa de centralização vertical, apenas horizontal. */
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
-            overflow-x: auto;
         }
 
         h1 {
@@ -138,11 +122,6 @@
             background: #34495e;
         }
 
-        input[type="submit"]:active,
-        input[type="button"]:active {
-            background: #1a252f;
-        }
-
         .btn-secondary {
             background: #7f8c8d;
         }
@@ -150,298 +129,46 @@
         .btn-secondary:hover {
             background: #95a5a6;
         }
-
-        .btn-danger {
-            background: #c0392b;
-        }
-
-        .btn-danger:hover {
-            background: #e74c3c;
-        }
-
-        .btn-success {
-            background: #27ae60;
-        }
-
-        .btn-success:hover {
-            background: #2ecc71;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: center;
-            border: 1px solid #ddd;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #2c3e50;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f0f0f0;
-        }
-
-        .checkbox-cell {
-            width: 50px;
-            text-align: center;
-        }
-
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .button-group input {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .page {
-            display: none;
-            /* Remove o padding padrão do body para evitar sobreposição */
-            padding: 0;
-        }
-
-        #tablePage.active {
-            display: block; /* Mude para 'block' para que o .table-container use margin: auto */
-            width: 100%;
-            min-height: 100vh;
-            padding-top: 20px; /* Adiciona o padding que foi removido do body */
-            padding-bottom: 20px; /* Adiciona o padding que foi removido do body */
-        }
-
-        #mainPage.active {
-            display: flex; /* Mantém 'flex' para centralizar o .container */
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            min-height: 100%;
-            padding-top: 20px; 
-            padding-bottom: 20px; 
-        }
-
-        #mainPage .container {
-            margin: auto; /* Garante a centralização se o flexbox for usado */
-        }
-
-        /* Corrige o .table-container para centralização horizontal */
-        #tablePage .table-container {
-            margin: 0 auto;
-        }
-
-        .page.active {
-            display: flex; /* Faz com que a página ativa seja um contêiner flexível */
-            justify-content: center; /* Centraliza o conteúdo da página ativa (o .container ou .table-container) */
-            align-items: center; /* Centraliza verticalmente o conteúdo da página ativa */
-            width: 100%; /* Garante que a página ativa ocupe toda a largura */
-            min-height: 100%; /* Garante que a página ativa ocupe toda a altura dentro do body flex */
-        }
-
-        .date-display {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 25px;
-            padding: 12px;
-            background: #ecf0f1;
-            border-radius: 4px;
-            border: 1px solid #bdc3c7;
-        }
-
-        .product-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .product-name {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .barcode-container {
-            margin-top: 5px;
-        }
-
-        .barcode-container svg {
-            max-width: 100%;
-            height: auto;
-        }
-
+        
         @media (max-width: 768px) {
-            .container, .table-container {
+            .container {
                 padding: 20px;
             }
 
             h1 {
                 font-size: 20px;
             }
-
-            table {
-                font-size: 13px;
-            }
-
-            th, td {
-                padding: 8px 6px;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .button-group input {
-                width: 100%;
-                min-width: auto;
-            }
-            
-            .container, .table-container {
-                padding: 20px;
-            }
-
-            /* Adiciona a centralização vertical no mobile também */
-            #mainPage.active {
-                padding: 20px; 
-            }
-
-            #tablePage.active {
-                padding: 20px 0; 
-            }
         }
-
-        /* INÍCIO: REGRA PARA IMPRESSÃO - ESCONDE BOTÕES E COLUNA DE CHECKBOX */
-        @media print {
-            /* 1. Esconde o grupo de botões */
-            .button-group {
-                display: none;
-            }
-
-            /* 2. Esconde a célula do cabeçalho com a checkbox "selecionar todos" */
-            #selectAll {
-                display: none;
-            }
-
-            /* 3. Esconde a coluna de checkbox nas linhas da tabela (tbody) */
-            .checkbox-cell {
-                display: none;
-            }
-
-            /* * Estilos de impressão opcionais para melhorar a formatação 
-            * (mantidos da resposta anterior)
-            */
-            .table-container {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                max-width: none;
-                width: 100%;
-            }
-
-            .barcode-container svg {
-                width: 100%; 
-                max-width: 250px; 
-                height: auto;
-            }
-            
-            th, td {
-                color: #2c3e50;
-                padding: 8px 10px;
-                text-align: center;
-            }
-            
-            th {
-                background-color: #ccc !important;
-
-            }
-            
-            tr:nth-child(even) {
-                background-color: #f0f0f0 !important;
-            }
-        }
-/* FIM: REGRA PARA IMPRESSÃO */
     </style>
 </head>
 <body>
-    <div id="mainPage" class="page active">
-        <div class="container">
-            <h1>Sistema de Registro de Produtos</h1>
-            <form id="productForm">
-                <div class="form-group">
-                    <label for="productName">Nome do Produto:</label>
-                    <input type="text" id="productName" autocomplete="off" required>
-                    <div id="autocompleteList" class="autocomplete-items"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="measureType">Tipo de Medida:</label>
-                    <input type="text" id="measureType" readonly>
-                </div>
-
-                <div class="form-group">
-                    <label for="quantity">Quantidade:</label>
-                    <input type="number" id="quantity" step="0.01" min="0.01" required>
-                </div>
-
-                <input type="submit" value="Adicionar Produto" id="btnAddProduct">
-                <input type="button" class="btn-secondary" value="Ver Tabela de Produtos" id="btnViewTable">
-            </form>
-        </div>
-    </div>
-
-    <div id="tablePage" class="page">
-        <div class="table-container">
-            <h1>Lista de Produtos Registrados</h1>
-            <div class="date-display" id="currentDate"></div>
-
-            <table id="productTable">
-                <thead>
-                    <tr>
-                        <th class="checkbox-cell"><input type="checkbox" id="selectAll"></th>
-                        <th>Produto</th>
-                        <th>Tipo</th>
-                        <th>Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
-            
-            <div class="button-group">
-                <input type="button" class="btn-success" value="Voltar" id="btnBack">
-                <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
-                <input type="button" class="btn-danger" value="Excluir Todos" id="btnDeleteAll">
+    <div class="container">
+        <h1>Sistema de Registro de Produtos</h1>
+        <form id="productForm">
+            <div class="form-group">
+                <label for="productName">Nome do Produto:</label>
+                <input type="text" id="productName" autocomplete="off" required>
+                <div id="autocompleteList" class="autocomplete-items"></div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="measureType">Tipo de Medida:</label>
+                <input type="text" id="measureType" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantidade:</label>
+                <input type="number" id="quantity" step="0.01" min="0.01" required>
+            </div>
+
+            <input type="submit" value="Adicionar Produto" id="btnAddProduct">
+            <input type="button" class="btn-secondary" value="Ver Tabela de Produtos" id="btnViewTable">
+        </form>
     </div>
 
     <script>
         const products = [
+            // A lista de produtos original foi mantida aqui
             { code: "0067690", name: "ABACATE KG", type: "KG" },
             { code: "0030441", name: "ABACAXI UN", type: "UN" },
             { code: "0067782", name: "ABOBORA ITALIANA KG", type: "KG" },
@@ -521,19 +248,19 @@
             { code: "0064248", name: "TOMATE LONGA VIDA KG", type: "KG" },
             { code: "0003681", name: "VAGEM KG", type: "KG" },
             { code: "0018425", name: "ROMA KG", type: "KG" },
-            { code: "301804", name: "UVA BEMFRUTI PTA,C/SEMENTE 500G BJ", type: "BJ" },
-            { code: "327194", name: "UVA BEMFRUTI ROSADA C/SEM.500G BJ", type: "BJ" },
-            { code: "301806", name: "UVA BEMFRUTI VDE.C/SEMENTE 500G BJ", type: "BJ" },
-            { code: "301808", name: "UVA BEMFRUTI VDE,S/SEMENTE 500G BJ", type: "BJ" },
-            { code: "301809", name: "UVA BEMFRUTI VERM.C/SEMENTE 500G BJ", type: "BJ" },
-            { code: "301810", name: "UVA BEMFRUTI VERM.S/SEMENTE 500G BJ", type: "BJ" },
-            { code: "301811", name: "UVA BEMFRUTI VITORIA S/SEM.500G BJ", type: "BJ" },
+            { code: "301804", name: "UVA BEMFRUTI PTA,C/SEMENTE 500G BJ", type: "UN" },
+            { code: "327194", name: "UVA BEMFRUTI ROSADA C/SEM.500G BJ", type: "UN" },
+            { code: "301806", name: "UVA BEMFRUTI VDE.C/SEMENTE 500G BJ", type: "UN" },
+            { code: "301808", name: "UVA BEMFRUTI VDE,S/SEMENTE 500G BJ", type: "UN" },
+            { code: "301809", name: "UVA BEMFRUTI VERM.C/SEMENTE 500G BJ", type: "UN" },
+            { code: "301810", name: "UVA BEMFRUTI VERM.S/SEMENTE 500G BJ", type: "UN" },
+            { code: "301811", name: "UVA BEMFRUTI VITORIA S/SEM.500G BJ", type: "UN" },
             { code: "0279475", name: "UVA BENITAKA KG", type: "KG" },
-            { code: "0639606", name: "UVA CRIMSON 500G BJ", type: "BJ" },
+            { code: "0639606", name: "UVA CRIMSON 500G BJ", type: "UN" },
             { code: "0827768", name: "UVA CRIMSON KG", type: "KG" },
-            { code: "0715591", name: "UVA CRIMSON S/SEMENTE 500G BJ", type: "BJ" },
+            { code: "0715591", name: "UVA CRIMSON S/SEMENTE 500G BJ", type: "UN" },
             { code: "0360036", name: "UVA ISIS KG", type: "KG" },
-            { code: "3252", name: "UVA ITALIA 500G BJ", type: "BJ" },
+            { code: "3252", name: "UVA ITALIA 500G BJ", type: "UN" },
             { code: "0003650", name: "UVA ITALIA KG", type: "KG" },
             { code: "0362399", name: "UVA JUBILE KG", type: "KG" },
             { code: "0616041", name: "UVA MOSCATEL KG", type: "KG" },
@@ -542,28 +269,54 @@
             { code: "0364775", name: "UVA PASSAS ESC POTE KG", type: "KG" },
             { code: "0362788", name: "UVA PASSAS PRETA S/CAR GRANEL KG", type: "KG" },
             { code: "0364508", name: "UVA PASSAS PTA S KG", type: "KG" },
-            { code: "79656", name: "UVA RED GLOBE 500G BJ", type: "BJ" },
+            { code: "79656", name: "UVA RED GLOBE 500G BJ", type: "UN" },
             { code: "0005302", name: "UVA RED GLOBE KG", type: "KG" },
-            { code: "2361116", name: "UVA ROSADA 500G BJ", type: "BJ" },
+            { code: "2361116", name: "UVA ROSADA 500G BJ", type: "UN" },
             { code: "0064408", name: "UVA ROSADA KG", type: "KG" },
             { code: "0366090", name: "UVA ROSADA NIAGARA CX PEQ UN", type: "UN" },
             { code: "2552897", name: "UVA ROSADA NIAGARA 500G BDJ", type: "BDJ" },
             { code: "0003674", name: "UVA RUBI KG", type: "KG" },
-            { code: "69920", name: "UVA THOMPSON 500G BJ", type: "BJ" },
+            { code: "69920", name: "UVA THOMPSON 500G BJ", type: "UN" },
             { code: "0005357", name: "UVA THOMPSON KG", type: "KG" },
             { code: "0359542", name: "UVA THOMPSON S/CAROCO 500 GR", type: "GR" },
-            { code: "148334", name: "UVA VITORIA 500G BJ", type: "BJ" },
+            { code: "148334", name: "UVA VITORIA 500G BJ", type: "UN" },
             { code: "0292900", name: "UVA VITORIA KG", type: "KG" },
-            { code: "287923", name: "OVOS BCOS.C/12 BJ", type: "BJ" },
-            { code: "131132", name: "OVOS BCOS.IANA EXTRA C/20 BJ", type: "BJ" },
-            { code: "326184", name: "OVOS BCOS.IANA EXTRA C/30 BJ", type: "BJ" },
-            { code: "131133", name: "OVOS BCOS.IANA GDE.C/12 BJ", type: "BJ" },
-            { code: "130962", name: "OVOS BCOS.IANA GDE.C/30 BJ", type: "BJ" },
-            { code: "327217", name: "OVOS BCOS.IANA KING EGGS JUMBO C/10 BJ", type: "BJ" },
-            { code: "333463", name: "OVOS BCOS.JETIBA EXTRA C/30 BJ", type: "BJ" },
-            { code: "285332", name: "OVOS BCOS.KEROVOS GDE.C/12 BJ", type: "BJ" }
+            { code: "287923", name: "OVOS BCOS.C/12 BJ", type: "UN" },
+            { code: "131132", name: "OVOS BCOS.IANA EXTRA C/20 BJ", type: "UN" },
+            { code: "326184", name: "OVOS BCOS.IANA EXTRA C/30 BJ", type: "UN" },
+            { code: "131133", name: "OVOS BCOS.IANA GDE.C/12 BJ", type: "UN" },
+            { code: "130962", name: "OVOS BCOS.IANA GDE.C/30 BJ", type: "UN" },
+            { code: "327217", name: "OVOS BCOS.IANA KING EGGS JUMBO C/10 BJ", type: "UN" },
+            { code: "333463", name: "OVOS BCOS.JETIBA EXTRA C/30 BJ", type: "UN" },
+            { code: "285332", name: "OVOS BCOS.KEROVOS GDE.C/12 BJ", type: "UN" },
+            { code: "7896292900523", name: "OVOS BCOS C/12 BJ", type: "UN" },
+            { code: "7897542820226", name: "OVOS BCOS IANA EXTRA C/20 BJ", type: "UN" },
+            { code: "7897542830638", name: "OVOS BCOS IANA EXTRA C/30 BJ", type: "UN" },
+            { code: "7897542830614", name: "OVOS BCOS IANA GDE C/12 BJ", type: "UN" },
+            { code: "7897542800037", name: "OVOS BCOS IANA GDE C/30 BJ", type: "UN" },
+            { code: "7897542830188", name: "OVOS BCOS IANA KING EGGS JUMBO C/10 BJ", type: "UN" },
+            { code: "7898270630118", name: "OVOS BCOS JETIBA EXTRA C/30 BJ", type: "UN" },
+            { code: "7897967900015", name: "OVOS BCOS KEROVOS GDE C/12 BJ", type: "UN" },
+            { code: "7898296880832", name: "OVOS BCOS LIVA EXTRA C/30 BJ", type: "UN" },
+            { code: "7898296880016", name: "OVOS BCOS LIVA GDE C/30 BJ", type: "UN" },
+            { code: "7898296880092", name: "OVOS BCOS LIVA JUMBO C/20 BJ", type: "UN" },
+            { code: "7898006890601", name: "OVOS BCOS POMMER GDE C/20 BJ", type: "UN" },
+            { code: "7898006890557", name: "OVOS BCOS POMMER GDE C/30 BJ", type: "UN" },
+            { code: "7898067740709", name: "OVOS BCOS STA MARIA GDE C/20 BJ", type: "UN" },
+            { code: "7898067740082", name: "OVOS BCOS STA MARIA GDE C/30 BJ", type: "UN" },
+            { code: "7898994511915", name: "OVOS CAIPIRA C/12 BJ", type: "UN" },
+            { code: "7898405740958", name: "OVOS CAIPIRA FAZENDA TOCA ORG LIBER C/20 UN", type: "UN" },
+            { code: "7898366170627", name: "OVOS CAIPIRA GL EXTRA C/12 BJ", type: "UN" },
+            { code: "0609963986170", name: "OVOS CAIPIRA SERRA DO MAR C/12 BJ", type: "UN" },
+            { code: "7897026290019", name: "OVOS CODORNA C/30 BJ", type: "UN" },
+            { code: "7898105591133", name: "OVOS CODORNA CARAMURU C/30 BJ", type: "UN" },
+            { code: "7898958911997", name: "OVOS CODORNA IANA C/30 BJ", type: "UN" },
+            { code: "7897967900091", name: "OVOS CODORNA KEROVOS C/30 BJ", type: "UN" },
+            { code: "7898908032024", name: "OVOS VERM C/12 BJ", type: "UN" },
+            { code: "7897542830607", name: "OVOS VERM IANA EXTRA C/30 BJ", type: "UN" },
+            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" },
         ];
-        
+
         let allProducts = products.map(p => p.name).sort();
         let productData = {};
 
@@ -571,25 +324,20 @@
         const autocompleteList = document.getElementById('autocompleteList');
         const measureType = document.getElementById('measureType');
 
-        // --- NOVAS FUNÇÕES PARA LOCALSTORAGE ---
         function saveProducts() {
-            // Converte o objeto de dados para string JSON e salva no localStorage
             localStorage.setItem('registeredProducts', JSON.stringify(productData));
         }
 
         function loadProducts() {
-            // Tenta buscar os dados salvos
             const savedData = localStorage.getItem('registeredProducts');
             if (savedData) {
-                // Se houver dados, parseia a string JSON de volta para objeto e carrega em productData
                 productData = JSON.parse(savedData);
             } else {
-                // Se não houver dados, inicializa como objeto vazio
                 productData = {};
             }
         }
-
-        loadProducts(); // Carrega os produtos salvos ao iniciar a página
+        
+        loadProducts(); // Carrega produtos existentes ao iniciar
 
         productInput.addEventListener('input', function() {
             const value = this.value.toLowerCase();
@@ -600,9 +348,7 @@
                 return;
             }
 
-            const filtered = allProducts.filter(p => 
-                p.toLowerCase().includes(value)
-            );
+            const filtered = allProducts.filter(p => p.toLowerCase().includes(value));
 
             filtered.forEach(productName => {
                 const div = document.createElement('div');
@@ -618,16 +364,7 @@
 
         function updateMeasureType(productName) {
             const product = products.find(p => p.name === productName);
-            if (product) {
-                measureType.value = product.type;
-            } else {
-                measureType.value = '';
-            }
-        }
-
-        function getProductCode(productName) {
-            const product = products.find(p => p.name === productName);
-            return product ? product.code : 'NOCODE000000';
+            measureType.value = product ? product.type : '';
         }
 
         function addProduct(e) {
@@ -645,14 +382,10 @@
             if (productData[name]) {
                 productData[name].quantity += quantity;
             } else {
-                productData[name] = {
-                    name: name,
-                    type: type,
-                    quantity: quantity
-                };
+                productData[name] = { name, type, quantity };
             }
             
-            saveProducts(); // Salva os dados atualizados no localStorage
+            saveProducts();
 
             productInput.value = '';
             document.getElementById('quantity').value = '';
@@ -664,168 +397,10 @@
 
         document.getElementById('productForm').addEventListener('submit', addProduct);
         
-        document.querySelector('input[type="submit"]').addEventListener('click', function(e) {
-            e.preventDefault();
-            addProduct(e);
-        });
-
+        // Alteração: o botão agora redireciona para a página da tabela
         document.getElementById('btnViewTable').addEventListener('click', function() {
-            showTablePage();
+            window.location.href = 'tabela.html';
         });
-
-        document.getElementById('btnBack').addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Botão Voltar clicado');
-            showMainPage();
-        });
-
-        document.getElementById('btnDeleteSelected').addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Botão Excluir Selecionados clicado');
-            deleteSelected();
-        });
-
-        document.getElementById('btnDeleteAll').addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Botão Excluir Todos clicado');
-            deleteAll();
-        });
-
-        document.getElementById('selectAll').addEventListener('click', function() {
-            toggleSelectAll();
-        });
-
-        function showTablePage() {
-            document.getElementById('mainPage').classList.remove('active');
-            document.getElementById('tablePage').classList.add('active');
-            updateTable();
-            updateDate();
-        }
-
-        function showMainPage() {
-            document.getElementById('tablePage').classList.remove('active');
-            document.getElementById('mainPage').classList.add('active');
-        }
-
-        function updateDate() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('pt-BR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            document.getElementById('currentDate').textContent = dateStr;
-        }
-
-        function generateBarcode(productName) {
-            return getProductCode(productName);
-        }
-
-        function updateTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-
-            if (Object.keys(productData).length === 0) {
-                const row = tbody.insertRow();
-                const cell = row.insertCell(0);
-                cell.colSpan = 4;
-                cell.textContent = 'Nenhum produto registrado';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '20px';
-                cell.style.color = '#999';
-                return;
-            }
-
-            Object.values(productData).forEach(product => {
-                const row = tbody.insertRow();
-                
-                const cellCheck = row.insertCell(0);
-                cellCheck.className = 'checkbox-cell';
-                cellCheck.innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${product.name}">`;
-                
-                const cellProduct = row.insertCell(1);
-                const barcodeId = 'barcode-' + product.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
-                cellProduct.innerHTML = `
-                    <div class="product-cell">
-                        <span class="product-name">${product.name}</span>
-                        <div class="barcode-container">
-                            <svg id="${barcodeId}"></svg>
-                        </div>
-                    </div>
-                `;
-                
-                const cellType = row.insertCell(2);
-                cellType.textContent = product.type;
-                
-                const cellQuantity = row.insertCell(3);
-                cellQuantity.textContent = product.quantity.toFixed(2);
-
-                setTimeout(() => {
-                    try {
-                        JsBarcode(`#${barcodeId}`, generateBarcode(product.name), {
-                            format: "CODE128",
-                            width: 1,
-                            height: 40,
-                            displayValue: true,
-                            fontSize: 10,
-                            margin: 2
-                        });
-                    } catch (e) {
-                        console.error('Erro ao gerar código de barras:', e);
-                    }
-                }, 100);
-            });
-        }
-
-        function toggleSelectAll() {
-            const selectAll = document.getElementById('selectAll');
-            const checkboxes = document.querySelectorAll('.row-checkbox');
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
-        }
-
-        function deleteSelected() {
-            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            
-            if (checkboxes.length === 0) {
-                alert('Selecione pelo menos um produto para excluir!');
-                return;
-            }
-
-            if (confirm(`Deseja excluir ${checkboxes.length} produto(s)?`)) {
-                checkboxes.forEach(cb => {
-                    const productName = cb.getAttribute('data-product');
-                    delete productData[productName];
-                });
-                
-                // SALVA OS DADOS APÓS EXCLUIR
-                saveProducts(); // <--- DEVE ESTAR AQUI
-                
-                updateTable();
-                document.getElementById('selectAll').checked = false;
-                alert('Produtos excluídos com sucesso!');
-            }
-        }
-
-        function deleteAll() {
-            const productCount = Object.keys(productData).length;
-            
-            if (productCount === 0) {
-                alert('Não há produtos para excluir!');
-                return;
-            }
-
-            if (confirm(`Deseja excluir TODOS os ${productCount} produto(s)?`)) {
-                productData = {};
-                
-                // SALVA OS DADOS APÓS EXCLUIR TODOS
-                saveProducts(); // <--- DEVE ESTAR AQUI
-
-                updateTable();
-                document.getElementById('selectAll').checked = false;
-                alert('Todos os produtos foram excluídos!');
-            }
-        }
 
         document.addEventListener('click', function(e) {
             if (e.target !== productInput) {
