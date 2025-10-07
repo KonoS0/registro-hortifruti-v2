@@ -129,7 +129,7 @@
         .btn-secondary:hover {
             background: #95a5a6;
         }
-        
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -213,6 +213,7 @@
             { code: "0065191", name: "MACA GRAN SMITH KG", type: "KG" },
             { code: "0001908", name: "MACA NACIONAL FUJI KG", type: "KG" },
             { code: "0001915", name: "MACA NACIONAL GALA KG", type: "KG" },
+            { code: "0275477", name: "MACA PINK LADY KG", type: "KG" },
             { code: "0001939", name: "MAMAO FORMOSO KG", type: "KG" },
             { code: "0001946", name: "MAMAO HAVAI KG", type: "KG" },
             { code: "0001960", name: "MANDIOCA KG", type: "KG" },
@@ -336,13 +337,13 @@
                 productData = {};
             }
         }
-        
+
         loadProducts(); // Carrega produtos existentes ao iniciar
 
         productInput.addEventListener('input', function() {
             const value = this.value.toLowerCase();
             autocompleteList.innerHTML = '';
-            
+
             if (!value) {
                 measureType.value = '';
                 return;
@@ -369,7 +370,7 @@
 
         function addProduct(e) {
             if (e) e.preventDefault();
-            
+
             const name = productInput.value.trim();
             const quantity = parseFloat(document.getElementById('quantity').value);
             const type = measureType.value;
@@ -384,19 +385,19 @@
             } else {
                 productData[name] = { name, type, quantity };
             }
-            
+
             saveProducts();
 
             productInput.value = '';
             document.getElementById('quantity').value = '';
             measureType.value = '';
-            
+
             alert('Produto adicionado com sucesso!');
             return false;
         }
 
         document.getElementById('productForm').addEventListener('submit', addProduct);
-        
+
         // Alteração: o botão agora redireciona para a página da tabela
         document.getElementById('btnViewTable').addEventListener('click', function() {
             window.location.href = 'tabela.html';
