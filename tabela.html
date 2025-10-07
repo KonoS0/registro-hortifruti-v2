@@ -140,7 +140,7 @@
             flex: 1;
             min-width: 150px;
         }
-        
+
         .date-display {
             text-align: center;
             color: #2c3e50;
@@ -245,7 +245,7 @@
             <tbody id="tableBody">
             </tbody>
         </table>
-        
+
         <div class="button-group">
             <input type="button" class="btn-success" value="Voltar" id="btnBack">
             <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
@@ -300,6 +300,7 @@
             { code: "0065191", name: "MACA GRAN SMITH KG", type: "KG" },
             { code: "0001908", name: "MACA NACIONAL FUJI KG", type: "KG" },
             { code: "0001915", name: "MACA NACIONAL GALA KG", type: "KG" },
+            { code: "0275477", name: "MACA PINK LADY KG", type: "KG" },
             { code: "0001939", name: "MAMAO FORMOSO KG", type: "KG" },
             { code: "0001946", name: "MAMAO HAVAI KG", type: "KG" },
             { code: "0001960", name: "MANDIOCA KG", type: "KG" },
@@ -403,7 +404,7 @@
             { code: "7897542830607", name: "OVOS VERM IANA EXTRA C/30 BJ", type: "UN" },
             { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" },
         ];
-        
+
         let productData = {};
 
         function saveProducts() {
@@ -423,7 +424,7 @@
             const product = products.find(p => p.name === productName);
             return product ? product.code : 'NOCODE000000';
         }
-        
+
         function updateDate() {
             const now = new Date();
             const dateStr = now.toLocaleDateString('pt-BR', {
@@ -448,14 +449,14 @@
                 const row = tbody.insertRow();
                 row.insertCell(0).innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${product.name}">`;
                 row.cells[0].className = 'checkbox-cell';
-                
+
                 const barcodeId = 'barcode-' + product.name.replace(/\W/g, '');
                 row.insertCell(1).innerHTML = `
                     <div class="product-cell">
                         <span class="product-name">${product.name}</span>
                         <div class="barcode-container"><svg id="${barcodeId}"></svg></div>
                     </div>`;
-                
+
                 row.insertCell(2).textContent = product.type;
                 row.insertCell(3).textContent = product.quantity.toFixed(2);
 
@@ -497,7 +498,7 @@
                 alert('Todos os produtos foram excluídos!');
             }
         }
-        
+
         // --- Event Listeners ---
         document.getElementById('btnBack').addEventListener('click', () => {
              window.location.href = 'index.html';
