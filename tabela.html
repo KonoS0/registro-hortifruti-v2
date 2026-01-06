@@ -248,6 +248,7 @@
 
         <div class="button-group">
             <input type="button" class="btn-success" value="Voltar" id="btnBack">
+            <input type="button" class="btn-print" value="Imprimir Tabela" id="btnPrint">
             <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
             <input type="button" class="btn-danger" value="Excluir Todos" id="btnDeleteAll">
         </div>
@@ -505,10 +506,15 @@
             }
         }
 
+        function printTable() {
+            window.print();
+        }
+
         // --- Event Listeners ---
         document.getElementById('btnBack').addEventListener('click', () => {
              window.location.href = 'index.html';
         });
+        document.getElementById('btnPrint').addEventListener('click', printTable);
         document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelected);
         document.getElementById('btnDeleteAll').addEventListener('click', deleteAll);
         document.getElementById('selectAll').addEventListener('click', toggleSelectAll);
