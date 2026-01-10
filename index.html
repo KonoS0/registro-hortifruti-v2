@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Registro de Produtos</title>
     <style>
-        /* Estilização original completa foi mantida aqui */
         * {
             margin: 0;
             padding: 0;
@@ -130,6 +129,21 @@
             background: #95a5a6;
         }
 
+        .info-text {
+            font-size: 12px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .weight-info {
+            background: #ecf0f1;
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -157,8 +171,15 @@
             </div>
 
             <div class="form-group">
-                <label for="quantity">Quantidade:</label>
+                <label for="boxes">Quantidade de Caixas:</label>
+                <input type="number" id="boxes" step="1" min="0" value="0">
+                <div class="info-text">Cada caixa desconta 1,75 kg do peso total (não aplicável para UN e BDJ)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">Quantidade (Peso Total):</label>
                 <input type="number" id="quantity" step="0.01" min="0.01" required>
+                <div id="weightInfo" class="weight-info" style="display: none;"></div>
             </div>
 
             <input type="submit" value="Adicionar Produto" id="btnAddProduct">
@@ -168,7 +189,6 @@
 
     <script>
         const products = [
-            // A lista de produtos original foi mantida aqui
             { code: "0067690", name: "ABACATE KG", type: "KG" },
             { code: "0030441", name: "ABACAXI UN", type: "UN" },
             { code: "0067782", name: "ABOBORA ITALIANA KG", type: "KG" },
@@ -321,15 +341,19 @@
             { code: "7897967900091", name: "OVOS CODORNA KEROVOS C/30 BJ", type: "UN" },
             { code: "7898908032024", name: "OVOS VERM C/12 BJ", type: "UN" },
             { code: "7897542830607", name: "OVOS VERM IANA EXTRA C/30 BJ", type: "UN" },
-            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" },
+            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" }
         ];
 
         let allProducts = products.map(p => p.name).sort();
         let productData = {};
+        const WEIGHT_PER_BOX = 1.75;
 
         const productInput = document.getElementById('productName');
         const autocompleteList = document.getElementById('autocompleteList');
         const measureType = document.getElementById('measureType');
+        const boxesInput = document.getElementById('boxes');
+        const quantityInput = document.getElementById('quantity');
+        const weightInfo = document.getElementById('weightInfo');
 
         function saveProducts() {
             localStorage.setItem('registeredProducts', JSON.stringify(productData));
@@ -344,7 +368,27 @@
             }
         }
 
-        loadProducts(); // Carrega produtos existentes ao iniciar
+        function updateWeightInfo() {
+            const type = measureType.value;
+            const boxes = parseInt(boxesInput.value) || 0;
+            const totalWeight = parseFloat(quantityInput.value) || 0;
+
+            if (type === 'KG' && boxes > 0 && totalWeight > 0) {
+                const boxWeight = boxes * WEIGHT_PER_BOX;
+                const netWeight = totalWeight - boxWeight;
+                weightInfo.style.display = 'block';
+                weightInfo.innerHTML = `
+                    <strong>Cálculo:</strong><br>
+                    Peso Total: ${totalWeight.toFixed(2)} kg<br>
+                    Peso das Caixas (${boxes}x): ${boxWeight.toFixed(2)} kg<br>
+                    <strong>Peso Líquido: ${netWeight.toFixed(2)} kg</strong>
+                `;
+            } else {
+                weightInfo.style.display = 'none';
+            }
+        }
+
+        loadProducts();
 
         productInput.addEventListener('input', function() {
             const value = this.value.toLowerCase();
@@ -372,39 +416,59 @@
         function updateMeasureType(productName) {
             const product = products.find(p => p.name === productName);
             measureType.value = product ? product.type : '';
+            updateWeightInfo();
         }
+
+        boxesInput.addEventListener('input', updateWeightInfo);
+        quantityInput.addEventListener('input', updateWeightInfo);
 
         function addProduct(e) {
             if (e) e.preventDefault();
 
             const name = productInput.value.trim();
-            const quantity = parseFloat(document.getElementById('quantity').value);
+            const quantity = parseFloat(quantityInput.value);
             const type = measureType.value;
+            const boxes = parseInt(boxesInput.value) || 0;
 
             if (!name || !quantity || !type) {
-                alert('Por favor, preencha todos os campos!');
+                alert('Por favor, preencha todos os campos obrigatórios!');
                 return false;
             }
 
+            let finalQuantity = quantity;
+
+            // Só aplica desconto de caixa para produtos em KG
+            if (type === 'KG' && boxes > 0) {
+                const boxWeight = boxes * WEIGHT_PER_BOX;
+                finalQuantity = quantity - boxWeight;
+                
+                if (finalQuantity <= 0) {
+                    alert('O peso das caixas excede o peso total! Verifique os valores.');
+                    return false;
+                }
+            }
+
+            // Salva o peso líquido já calculado
             if (productData[name]) {
-                productData[name].quantity += quantity;
+                productData[name].quantity += finalQuantity;
             } else {
-                productData[name] = { name, type, quantity };
+                productData[name] = { name, type, quantity: finalQuantity };
             }
 
             saveProducts();
 
             productInput.value = '';
-            document.getElementById('quantity').value = '';
+            quantityInput.value = '';
+            boxesInput.value = '0';
             measureType.value = '';
+            weightInfo.style.display = 'none';
 
-            alert('Produto adicionado com sucesso!');
+            alert(`Produto adicionado com sucesso!\nPeso líquido registrado: ${finalQuantity.toFixed(2)} ${type}`);
             return false;
         }
 
         document.getElementById('productForm').addEventListener('submit', addProduct);
 
-        // Alteração: o botão agora redireciona para a página da tabela
         document.getElementById('btnViewTable').addEventListener('click', function() {
             window.location.href = 'tabela.html';
         });
