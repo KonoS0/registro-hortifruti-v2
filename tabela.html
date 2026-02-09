@@ -226,6 +226,22 @@
             th { background-color: #ccc !important; }
             tr:nth-child(even) { background-color: #f0f0f0 !important; }
         }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .button-group, .checkbox-cell, #selectAll { display: none !important; }
+            .table-container { box-shadow: none; border: none; width: 100%; }
+            
+            tr {
+                page-break-inside: avoid; /* Evita cortar um item ao meio */
+            }
+
+            .page-break {
+                display: block;
+                page-break-after: always;
+            }
+        }
+        
     </style>
 </head>
 <body>
