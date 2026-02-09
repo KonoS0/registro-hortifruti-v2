@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Produtos - Sistema de Registro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Estilização original completa foi mantida aqui */
         * {
@@ -231,7 +233,7 @@
             body { background: white; padding: 0; }
             .button-group, .checkbox-cell, #selectAll { display: none !important; }
             .table-container { box-shadow: none; border: none; width: 100%; }
-            
+
             tr {
                 page-break-inside: avoid; /* Evita cortar um item ao meio */
             }
@@ -241,7 +243,7 @@
                 page-break-after: always;
             }
         }
-        
+
     </style>
 </head>
 <body>
@@ -264,7 +266,7 @@
 
         <div class="button-group">
             <input type="button" class="btn-success" value="Voltar" id="btnBack">
-            <input type="button" class="btn-print" value="Imprimir Tabela" id="btnPrint">
+            <input type="button" class="btn-success" value="Exportar PDF" id="btnExportPDF">
             <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
             <input type="button" class="btn-danger" value="Excluir Todos" id="btnDeleteAll">
         </div>
@@ -526,11 +528,107 @@
             window.print();
         }
 
+        async function exportToPDF() {
+            if (Object.keys(productData).length === 0) {
+                alert('Não há produtos para exportar!');
+                return;
+            }
+
+            try {
+                // Mostra mensagem de carregamento
+                const btnExport = document.getElementById('btnExportPDF');
+                const originalText = btnExport.value;
+                btnExport.value = 'Gerando PDF...';
+                btnExport.disabled = true;
+
+                // Aguarda um pequeno delay para garantir que os códigos de barras foram renderizados
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Obtém a tabela e data
+                const tableContainer = document.querySelector('.table-container');
+                const { jsPDF } = window.jspdf;
+
+                // Cria um clone da tabela para renderização
+                const clone = tableContainer.cloneNode(true);
+                
+                // Remove checkboxes e botões do clone
+                clone.querySelectorAll('.button-group').forEach(el => el.remove());
+                clone.querySelectorAll('.checkbox-cell').forEach(el => el.remove());
+                clone.querySelector('#selectAll')?.parentElement?.remove();
+                
+                // Ajusta estilo do clone para melhor renderização
+                clone.style.position = 'absolute';
+                clone.style.left = '-9999px';
+                clone.style.top = '0';
+                clone.style.width = '1000px';
+                clone.style.background = 'white';
+                clone.style.padding = '40px';
+                
+                document.body.appendChild(clone);
+
+                // Captura o elemento como imagem usando html2canvas
+                const canvas = await html2canvas(clone, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+
+                // Remove o clone
+                document.body.removeChild(clone);
+
+                // Cria o PDF
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210; // Largura A4 em mm
+                const pageHeight = 297; // Altura A4 em mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                // Adiciona primeira página
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                // Adiciona páginas adicionais se necessário
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                // Gera nome do arquivo com data
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+                const filename = `produtos_${dateStr}_${timeStr}.pdf`;
+
+                // Salva o PDF
+                pdf.save(filename);
+
+                // Restaura o botão
+                btnExport.value = originalText;
+                btnExport.disabled = false;
+
+                alert('PDF exportado com sucesso!');
+            } catch (error) {
+                console.error('Erro ao exportar PDF:', error);
+                alert('Erro ao gerar PDF. Por favor, tente novamente.');
+                
+                // Restaura o botão em caso de erro
+                const btnExport = document.getElementById('btnExportPDF');
+                btnExport.value = 'Exportar PDF';
+                btnExport.disabled = false;
+            }
+        }
+
         // --- Event Listeners ---
         document.getElementById('btnBack').addEventListener('click', () => {
              window.location.href = 'index.html';
         });
-        document.getElementById('btnPrint').addEventListener('click', printTable);
+        document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
         document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelected);
         document.getElementById('btnDeleteAll').addEventListener('click', deleteAll);
         document.getElementById('selectAll').addEventListener('click', toggleSelectAll);
