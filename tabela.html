@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* Estilização original completa foi mantida aqui */
         * {
             margin: 0;
             padding: 0;
@@ -64,6 +63,11 @@
 
         input[type="button"]:active {
             background: #1a252f;
+        }
+
+        input[type="button"]:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
         }
 
         .btn-secondary {
@@ -186,71 +190,42 @@
                 font-size: 20px;
             }
 
-            table {
-                font-size: 13px;
-            }
-
-            th, td {
-                padding: 8px 6px;
-            }
-
             .button-group {
                 flex-direction: column;
             }
 
             .button-group input {
                 width: 100%;
-                min-width: auto;
             }
         }
 
         @media print {
-            .button-group, .checkbox-cell, #selectAll {
-                display: none;
+            body {
+                background: white;
+                padding: 0;
             }
+
             .table-container {
                 box-shadow: none;
                 border: none;
-                padding: 0;
-                max-width: none;
-                width: 100%;
-            }
-            .barcode-container svg {
-                width: 100%; 
-                max-width: 250px; 
-                height: auto;
-            }
-            th, td {
-                color: #2c3e50;
-                padding: 8px 10px;
-                text-align: center;
-            }
-            th { background-color: #ccc !important; }
-            tr:nth-child(even) { background-color: #f0f0f0 !important; }
-        }
-
-        @media print {
-            body { background: white; padding: 0; }
-            .button-group, .checkbox-cell, #selectAll { display: none !important; }
-            .table-container { box-shadow: none; border: none; width: 100%; }
-
-            tr {
-                page-break-inside: avoid; /* Evita cortar um item ao meio */
+                padding: 20px;
             }
 
-            .page-break {
-                display: block;
-                page-break-after: always;
+            input[type="button"] {
+                display: none;
+            }
+
+            .button-group {
+                display: none;
             }
         }
-
     </style>
 </head>
 <body>
     <div class="table-container">
         <h1>Lista de Produtos Registrados</h1>
         <div class="date-display" id="currentDate"></div>
-
+        
         <table id="productTable">
             <thead>
                 <tr>
@@ -260,38 +235,40 @@
                     <th>Quantidade</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
 
         <div class="button-group">
-            <input type="button" class="btn-success" value="Voltar" id="btnBack">
-            <input type="button" class="btn-success" value="Exportar PDF" id="btnExportPDF">
-            <input type="button" class="btn-danger" value="Excluir Selecionados" id="btnDeleteSelected">
-            <input type="button" class="btn-danger" value="Excluir Todos" id="btnDeleteAll">
+            <input type="button" value="Voltar para Registro" class="btn-secondary" onclick="location.href='index.html'">
+            <input type="button" value="Gerar PDF" id="btnGeneratePDF" class="btn-success" onclick="generatePDF()">
+            <input type="button" value="Limpar Selecionados" class="btn-danger" onclick="deleteSelected()">
+            <input type="button" value="Limpar Todos" class="btn-danger" onclick="clearAll()">
         </div>
     </div>
 
     <script>
         const products = [
-             // A lista de produtos original foi mantida aqui para gerar os códigos de barras
-             { code: "0067690", name: "ABACATE KG", type: "KG" },
-            { code: "0030441", name: "ABACAXI UN", type: "UN" },
-            { code: "0067782", name: "ABOBORA ITALIANA KG", type: "KG" },
-            { code: "0058735", name: "ABOBORA JACARE KG", type: "KG" },
-            { code: "0328647", name: "ABOBORA MARANHAO KG", type: "KG" },
-            { code: "0067850", name: "ABOBORA MORANGA JAPONESA KG", type: "KG" },
-            { code: "0328524", name: "ABOBRINHA JACAREZINHO REDONDA KG", type: "KG" },
-            { code: "0046435", name: "ALHO GRANEL KG", type: "KG" },
-            { code: "0068178", name: "AMEIXA IMPORTADA KG", type: "KG" },
-            { code: "0295666", name: "AMEIXA NACIONAL SM KG", type: "KG" },
-            { code: "0067195", name: "BANANA CATURRA KG", type: "KG" },
-            { code: "0067201", name: "BANANA MACA KG", type: "KG" },
-            { code: "0028394", name: "BANANA OURO KG", type: "KG" },
-            { code: "0067218", name: "BANANA PRATA KG", type: "KG" },
-            { code: "0068147", name: "BANANA TERRA KG", type: "KG" },
-            { code: "0079143", name: "BATATA ASTERIX KG", type: "KG" },
-            { code: "0037815", name: "BATATA DOCE BRANCA KG", type: "KG" },
+            { code: "0002073", name: "ABACATE AVOCADO KG", type: "KG" },
+            { code: "0002080", name: "ABACATE FORTUNA KG", type: "KG" },
+            { code: "0001069", name: "ABACAXI HAWAI KG", type: "KG" },
+            { code: "0001076", name: "ABACAXI PEROLA KG", type: "KG" },
+            { code: "0001090", name: "ABOBRINHA NACIONAL KG", type: "KG" },
+            { code: "0305102", name: "ACELGA KG", type: "KG" },
+            { code: "0073180", name: "ACEROLA KG", type: "KG" },
+            { code: "0001106", name: "ALFACE AMERICANA UN", type: "UN" },
+            { code: "0002387", name: "ALFACE CRESPA UN", type: "UN" },
+            { code: "0003216", name: "ALFACE LISA UN", type: "UN" },
+            { code: "0002394", name: "ALFACE ROXA UN", type: "UN" },
+            { code: "0001113", name: "ALHO BRANCO KG", type: "KG" },
+            { code: "0002141", name: "AMEIXA IMPORTADA KG", type: "KG" },
+            { code: "0002158", name: "AMEIXA NACIONAL KG", type: "KG" },
+            { code: "0002165", name: "BANANA D'AGUA KG", type: "KG" },
+            { code: "0002189", name: "BANANA NANICA KG", type: "KG" },
+            { code: "0002196", name: "BANANA PRATA KG", type: "KG" },
+            { code: "0010993", name: "BATATA BAROA/MANDIOQUINHA KG", type: "KG" },
+            { code: "0067201", name: "BATATA BOLINHA KG", type: "KG" },
+            { code: "0067225", name: "BATATA DOCE BRANCA KG", type: "KG" },
+            { code: "0002219", name: "BATATA DOCE KG", type: "KG" },
             { code: "0067232", name: "BATATA DOCE ROXA KG", type: "KG" },
             { code: "0067249", name: "BATATA INGLESA KG", type: "KG" },
             { code: "0067256", name: "BERINJELA KG", type: "KG" },
@@ -427,7 +404,7 @@
             { code: "7897967900091", name: "OVOS CODORNA KEROVOS C/30 BJ", type: "UN" },
             { code: "7898908032024", name: "OVOS VERM C/12 BJ", type: "UN" },
             { code: "7897542830607", name: "OVOS VERM IANA EXTRA C/30 BJ", type: "UN" },
-            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" },
+            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" }
         ];
 
         let productData = {};
@@ -472,324 +449,189 @@
 
             Object.values(productData).forEach(product => {
                 const row = tbody.insertRow();
-                row.insertCell(0).innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${product.name}">`;
-                row.cells[0].className = 'checkbox-cell';
+                
+                const cellCheck = row.insertCell(0);
+                cellCheck.className = 'checkbox-cell';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.productName = product.name;
+                cellCheck.appendChild(checkbox);
 
-                const barcodeId = 'barcode-' + product.name.replace(/\W/g, '');
-                row.insertCell(1).innerHTML = `
-                    <div class="product-cell">
-                        <span class="product-name">${product.name}</span>
-                        <div class="barcode-container"><svg id="${barcodeId}"></svg></div>
-                    </div>`;
+                const cellProduct = row.insertCell(1);
+                const productDiv = document.createElement('div');
+                productDiv.className = 'product-cell';
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'product-name';
+                nameDiv.textContent = product.name;
+                productDiv.appendChild(nameDiv);
+
+                const barcodeDiv = document.createElement('div');
+                barcodeDiv.className = 'barcode-container';
+                const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                barcodeDiv.appendChild(barcodeSvg);
+                productDiv.appendChild(barcodeDiv);
+
+                cellProduct.appendChild(productDiv);
+
+                const code = getProductCode(product.name);
+                try {
+                    JsBarcode(barcodeSvg, code, {
+                        format: 'CODE128',
+                        width: 1,
+                        height: 30,
+                        displayValue: true,
+                        fontSize: 10,
+                        margin: 2
+                    });
+                } catch (error) {
+                    console.error('Erro ao gerar código de barras:', error);
+                    barcodeDiv.textContent = code;
+                }
 
                 row.insertCell(2).textContent = product.type;
                 row.insertCell(3).textContent = product.quantity.toFixed(2);
-
-                setTimeout(() => {
-                    try {
-                        JsBarcode(`#${barcodeId}`, getProductCode(product.name), {
-                            format: "CODE128", width: 1, height: 40, displayValue: true, fontSize: 10, margin: 2
-                        });
-                    } catch (e) { console.error('Erro ao gerar código de barras:', e); }
-                }, 100);
             });
         }
 
-        function toggleSelectAll() {
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = document.getElementById('selectAll').checked);
-        }
-
         function deleteSelected() {
-            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            if (checkboxes.length === 0) return alert('Selecione pelo menos um produto para excluir!');
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][data-product-name]');
+            let deletedCount = 0;
 
-            if (confirm(`Deseja excluir ${checkboxes.length} produto(s)?`)) {
-                checkboxes.forEach(cb => delete productData[cb.getAttribute('data-product')]);
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const productName = checkbox.dataset.productName;
+                    delete productData[productName];
+                    deletedCount++;
+                }
+            });
+
+            if (deletedCount > 0) {
                 saveProducts();
                 updateTable();
-                document.getElementById('selectAll').checked = false;
-                alert('Produtos excluídos com sucesso!');
+                alert(`${deletedCount} produto(s) removido(s) com sucesso!`);
+            } else {
+                alert('Nenhum produto selecionado para remoção.');
             }
         }
 
-        function deleteAll() {
-            const count = Object.keys(productData).length;
-            if (count === 0) return alert('Não há produtos para excluir!');
-            if (confirm(`Deseja excluir TODOS os ${count} produto(s)?`)) {
-                productData = {};
-                saveProducts();
-                updateTable();
-                document.getElementById('selectAll').checked = false;
-                alert('Todos os produtos foram excluídos!');
-            }
-        }
-
-        async function exportToPDF() {
+        function clearAll() {
             if (Object.keys(productData).length === 0) {
-                alert('Não há produtos para exportar!');
+                alert('Não há produtos para limpar.');
                 return;
             }
 
-            try {
-                // Mostra mensagem de carregamento
-                const btnExport = document.getElementById('btnExportPDF');
-                const originalText = btnExport.value;
-                btnExport.value = 'Gerando PDF...';
-                btnExport.disabled = true;
-
-                // Aguarda os códigos de barras serem renderizados
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const pageWidth = 210;
-                const pageHeight = 297;
-                
-                // Converte produtos em array
-                const productsArray = Object.values(productData);
-                const ITEMS_PER_PAGE = 8;
-                const totalPages = Math.ceil(productsArray.length / ITEMS_PER_PAGE);
-                
-                // Gera cada página
-                for (let pageNum = 0; pageNum < totalPages; pageNum++) {
-                    if (pageNum > 0) {
-                        pdf.addPage();
-                    }
-                    
-                    // Cria container temporário para esta página
-                    const pageContainer = document.createElement('div');
-                    pageContainer.style.cssText = `
-                        position: absolute;
-                        left: -9999px;
-                        top: 0;
-                        width: 1200px;
-                        background: white;
-                        padding: 40px;
-                        font-family: Arial, sans-serif;
-                    `;
-                    
-                    // Adiciona título
-                    const title = document.createElement('h1');
-                    title.style.cssText = `
-                        color: #2c3e50;
-                        text-align: center;
-                        margin-bottom: 30px;
-                        font-size: 24px;
-                        font-weight: 600;
-                        letter-spacing: 0.5px;
-                    `;
-                    title.textContent = 'Lista de Produtos Registrados';
-                    pageContainer.appendChild(title);
-                    
-                    // Adiciona data
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('pt-BR', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    });
-                    const dateDiv = document.createElement('div');
-                    dateDiv.style.cssText = `
-                        text-align: center;
-                        color: #2c3e50;
-                        font-size: 16px;
-                        font-weight: 500;
-                        margin-bottom: 25px;
-                        padding: 12px;
-                        background: #ecf0f1;
-                        border-radius: 4px;
-                        border: 1px solid #bdc3c7;
-                    `;
-                    dateDiv.textContent = dateStr;
-                    pageContainer.appendChild(dateDiv);
-                    
-                    // Cria tabela
-                    const table = document.createElement('table');
-                    table.style.cssText = `
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                        background: white;
-                        border: 1px solid #ddd;
-                    `;
-                    
-                    // Cabeçalho da tabela
-                    const thead = document.createElement('thead');
-                    const headerRow = document.createElement('tr');
-                    
-                    const headers = ['Produto', 'Tipo', 'Quantidade'];
-                    headers.forEach(headerText => {
-                        const th = document.createElement('th');
-                        th.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            background: #2c3e50;
-                            color: white;
-                            font-weight: 600;
-                            font-size: 14px;
-                        `;
-                        th.textContent = headerText;
-                        headerRow.appendChild(th);
-                    });
-                    thead.appendChild(headerRow);
-                    table.appendChild(thead);
-                    
-                    // Corpo da tabela
-                    const tbody = document.createElement('tbody');
-                    const startIdx = pageNum * ITEMS_PER_PAGE;
-                    const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, productsArray.length);
-                    
-                    for (let i = startIdx; i < endIdx; i++) {
-                        const product = productsArray[i];
-                        const tr = document.createElement('tr');
-                        const isEven = (i - startIdx) % 2 === 0;
-                        
-                        if (isEven) {
-                            tr.style.backgroundColor = '#f9f9f9';
-                        }
-                        
-                        // Célula do produto (com nome e código de barras)
-                        const tdProduct = document.createElement('td');
-                        tdProduct.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        
-                        const productCell = document.createElement('div');
-                        productCell.style.cssText = `
-                            display: flex;
-                            flex-direction: column;
-                            gap: 8px;
-                            align-items: center;
-                            justify-content: center;
-                        `;
-                        
-                        const productName = document.createElement('span');
-                        productName.style.cssText = `
-                            font-weight: 500;
-                            color: #2c3e50;
-                        `;
-                        productName.textContent = product.name;
-                        productCell.appendChild(productName);
-                        
-                        // Código de barras
-                        const barcodeContainer = document.createElement('div');
-                        barcodeContainer.style.marginTop = '5px';
-                        const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                        const barcodeId = 'barcode-pdf-' + i;
-                        barcodeSvg.id = barcodeId;
-                        barcodeContainer.appendChild(barcodeSvg);
-                        productCell.appendChild(barcodeContainer);
-                        
-                        tdProduct.appendChild(productCell);
-                        tr.appendChild(tdProduct);
-                        
-                        // Célula do tipo
-                        const tdType = document.createElement('td');
-                        tdType.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        tdType.textContent = product.type;
-                        tr.appendChild(tdType);
-                        
-                        // Célula da quantidade
-                        const tdQuantity = document.createElement('td');
-                        tdQuantity.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        tdQuantity.textContent = product.quantity.toFixed(2);
-                        tr.appendChild(tdQuantity);
-                        
-                        tbody.appendChild(tr);
-                        
-                        // Gera código de barras após adicionar ao DOM
-                        document.body.appendChild(pageContainer);
-                        try {
-                            JsBarcode(`#${barcodeId}`, getProductCode(product.name), {
-                                format: "CODE128",
-                                width: 1,
-                                height: 40,
-                                displayValue: true,
-                                fontSize: 10,
-                                margin: 2
-                            });
-                        } catch (e) {
-                            console.error('Erro ao gerar código de barras:', e);
-                        }
-                        document.body.removeChild(pageContainer);
-                    }
-                    
-                    table.appendChild(tbody);
-                    pageContainer.appendChild(table);
-                    
-                    // Adiciona ao DOM temporariamente
-                    document.body.appendChild(pageContainer);
-                    
-                    // Captura como imagem
-                    const canvas = await html2canvas(pageContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                        backgroundColor: '#ffffff'
-                    });
-                    
-                    // Remove do DOM
-                    document.body.removeChild(pageContainer);
-                    
-                    // Adiciona ao PDF
-                    const imgData = canvas.toDataURL('image/png');
-                    const imgWidth = pageWidth;
-                    const imgHeight = (canvas.height * pageWidth) / canvas.width;
-                    
-                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                }
-                
-                // Gera nome do arquivo com data
-                const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
-                const filename = `produtos_${new Date().toISOString().split('T')[0]}_${timeStr}.pdf`;
-                
-                // Salva o PDF
-                pdf.save(filename);
-                
-                // Restaura o botão
-                btnExport.value = originalText;
-                btnExport.disabled = false;
-                
-                alert('PDF exportado com sucesso!');
-            } catch (error) {
-                console.error('Erro ao exportar PDF:', error);
-                alert('Erro ao gerar PDF. Por favor, tente novamente.');
-                
-                // Restaura o botão em caso de erro
-                const btnExport = document.getElementById('btnExportPDF');
-                btnExport.value = 'Exportar PDF';
-                btnExport.disabled = false;
+            if (confirm('Tem certeza que deseja limpar TODOS os produtos? Esta ação não pode ser desfeita.')) {
+                productData = {};
+                saveProducts();
+                updateTable();
+                alert('Todos os produtos foram removidos!');
             }
         }
 
-        // --- Event Listeners ---
-        document.getElementById('btnBack').addEventListener('click', () => {
-             window.location.href = 'index.html';
-        });
-        document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
-        document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelected);
-        document.getElementById('btnDeleteAll').addEventListener('click', deleteAll);
-        document.getElementById('selectAll').addEventListener('click', toggleSelectAll);
+        async function generatePDF() {
+            const button = document.getElementById('btnGeneratePDF');
+            
+            try {
+                // Desabilita o botão
+                button.disabled = true;
+                button.value = 'Gerando PDF...';
 
-        // --- Inicialização da página ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProducts();
-            updateDate();
-            updateTable();
+                // Verifica se há produtos
+                if (Object.keys(productData).length === 0) {
+                    alert('Não há produtos para gerar PDF.');
+                    return;
+                }
+
+                // Carrega jsPDF
+                const { jsPDF } = window.jspdf;
+                
+                if (!jsPDF) {
+                    throw new Error('Biblioteca jsPDF não carregada');
+                }
+
+                // Oculta botões temporariamente
+                const buttonGroup = document.querySelector('.button-group');
+                const originalDisplay = buttonGroup.style.display;
+                buttonGroup.style.display = 'none';
+
+                // Aguarda um momento para garantir que a renderização está completa
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Captura a tabela como imagem usando html2canvas
+                const tableContainer = document.querySelector('.table-container');
+                
+                const canvas = await html2canvas(tableContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff'
+                });
+
+                // Restaura os botões
+                buttonGroup.style.display = originalDisplay;
+
+                // Verifica se o canvas foi criado corretamente
+                if (!canvas || canvas.width === 0 || canvas.height === 0) {
+                    throw new Error('Erro ao capturar a tabela');
+                }
+
+                // Converte canvas para imagem
+                const imgData = canvas.toDataURL('image/png');
+                
+                if (!imgData || imgData === 'data:,') {
+                    throw new Error('Erro ao converter canvas para imagem');
+                }
+
+                // Cria o PDF
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Calcula dimensões para caber na página
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pageWidth - 20; // 10mm de margem de cada lado
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                // Adiciona a imagem ao PDF
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+
+                // Gera o nome do arquivo com data
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('pt-BR').replace(/\//g, '-');
+                const fileName = `lista-produtos-${dateStr}.pdf`;
+
+                // Salva o PDF
+                pdf.save(fileName);
+
+                // Mensagem de sucesso
+                alert('PDF gerado com sucesso!');
+
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Erro ao gerar PDF: ' + error.message + '\n\nPor favor, tente novamente.');
+            } finally {
+                // Reabilita o botão
+                button.disabled = false;
+                button.value = 'Gerar PDF';
+            }
+        }
+
+        // Event listener para "Selecionar Todos"
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][data-product-name]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
         });
+
+        // Inicializa a página
+        loadProducts();
+        updateDate();
+        updateTable();
     </script>
 </body>
 </html>
