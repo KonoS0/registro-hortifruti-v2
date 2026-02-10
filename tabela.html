@@ -551,167 +551,66 @@
                 const ITEMS_PER_PAGE = 8;
                 const totalPages = Math.ceil(productsArray.length / ITEMS_PER_PAGE);
                 
-                // Gera cada página
+                // Para cada página, cria uma versão da tabela com apenas os itens daquela página
                 for (let pageNum = 0; pageNum < totalPages; pageNum++) {
                     if (pageNum > 0) {
                         pdf.addPage();
                     }
                     
-                    // Cria container temporário para esta página
-                    const pageContainer = document.createElement('div');
-                    pageContainer.style.cssText = `
-                        position: absolute;
-                        left: -9999px;
-                        top: 0;
-                        width: 1200px;
-                        background: white;
-                        padding: 40px;
-                        font-family: Arial, sans-serif;
-                    `;
+                    // Clona o container original
+                    const tableContainer = document.querySelector('.table-container');
+                    const clone = tableContainer.cloneNode(true);
                     
-                    // Adiciona título
-                    const title = document.createElement('h1');
-                    title.style.cssText = `
-                        color: #2c3e50;
-                        text-align: center;
-                        margin-bottom: 30px;
-                        font-size: 24px;
-                        font-weight: 600;
-                        letter-spacing: 0.5px;
-                    `;
-                    title.textContent = 'Lista de Produtos Registrados';
-                    pageContainer.appendChild(title);
+                    // Remove botões e checkboxes do clone
+                    clone.querySelectorAll('.button-group').forEach(el => el.remove());
+                    clone.querySelectorAll('.checkbox-cell').forEach(el => el.remove());
+                    const selectAllHeader = clone.querySelector('#selectAll');
+                    if (selectAllHeader) {
+                        selectAllHeader.parentElement.remove();
+                    }
                     
-                    // Adiciona data
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('pt-BR', {
-                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                    });
-                    const dateDiv = document.createElement('div');
-                    dateDiv.style.cssText = `
-                        text-align: center;
-                        color: #2c3e50;
-                        font-size: 16px;
-                        font-weight: 500;
-                        margin-bottom: 25px;
-                        padding: 12px;
-                        background: #ecf0f1;
-                        border-radius: 4px;
-                        border: 1px solid #bdc3c7;
-                    `;
-                    dateDiv.textContent = dateStr;
-                    pageContainer.appendChild(dateDiv);
+                    // Limpa o tbody do clone
+                    const tbody = clone.querySelector('#tableBody');
+                    tbody.innerHTML = '';
                     
-                    // Cria tabela
-                    const table = document.createElement('table');
-                    table.style.cssText = `
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin: 20px 0;
-                        background: white;
-                        border: 1px solid #ddd;
-                    `;
-                    
-                    // Cabeçalho da tabela
-                    const thead = document.createElement('thead');
-                    const headerRow = document.createElement('tr');
-                    
-                    const headers = ['Produto', 'Tipo', 'Quantidade'];
-                    headers.forEach(headerText => {
-                        const th = document.createElement('th');
-                        th.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            background: #2c3e50;
-                            color: white;
-                            font-weight: 600;
-                            font-size: 14px;
-                        `;
-                        th.textContent = headerText;
-                        headerRow.appendChild(th);
-                    });
-                    thead.appendChild(headerRow);
-                    table.appendChild(thead);
-                    
-                    // Corpo da tabela
-                    const tbody = document.createElement('tbody');
+                    // Adiciona apenas os produtos desta página
                     const startIdx = pageNum * ITEMS_PER_PAGE;
                     const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, productsArray.length);
                     
                     for (let i = startIdx; i < endIdx; i++) {
                         const product = productsArray[i];
-                        const tr = document.createElement('tr');
-                        const isEven = (i - startIdx) % 2 === 0;
+                        const row = tbody.insertRow();
                         
-                        if (isEven) {
-                            tr.style.backgroundColor = '#f9f9f9';
-                        }
-                        
-                        // Célula do produto (com nome e código de barras)
-                        const tdProduct = document.createElement('td');
-                        tdProduct.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        
-                        const productCell = document.createElement('div');
-                        productCell.style.cssText = `
-                            display: flex;
-                            flex-direction: column;
-                            gap: 8px;
-                            align-items: center;
-                            justify-content: center;
-                        `;
-                        
-                        const productName = document.createElement('span');
-                        productName.style.cssText = `
-                            font-weight: 500;
-                            color: #2c3e50;
-                        `;
-                        productName.textContent = product.name;
-                        productCell.appendChild(productName);
-                        
-                        // Código de barras
-                        const barcodeContainer = document.createElement('div');
-                        barcodeContainer.style.marginTop = '5px';
-                        const barcodeSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                        const barcodeId = 'barcode-pdf-' + i;
-                        barcodeSvg.id = barcodeId;
-                        barcodeContainer.appendChild(barcodeSvg);
-                        productCell.appendChild(barcodeContainer);
-                        
-                        tdProduct.appendChild(productCell);
-                        tr.appendChild(tdProduct);
+                        // Célula do produto
+                        const barcodeId = 'barcode-pdf-' + i + '-' + pageNum;
+                        row.insertCell(0).innerHTML = `
+                            <div class="product-cell">
+                                <span class="product-name">${product.name}</span>
+                                <div class="barcode-container"><svg id="${barcodeId}"></svg></div>
+                            </div>`;
                         
                         // Célula do tipo
-                        const tdType = document.createElement('td');
-                        tdType.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        tdType.textContent = product.type;
-                        tr.appendChild(tdType);
+                        row.insertCell(1).textContent = product.type;
                         
                         // Célula da quantidade
-                        const tdQuantity = document.createElement('td');
-                        tdQuantity.style.cssText = `
-                            padding: 12px 15px;
-                            text-align: center;
-                            border: 1px solid #ddd;
-                            vertical-align: middle;
-                        `;
-                        tdQuantity.textContent = product.quantity.toFixed(2);
-                        tr.appendChild(tdQuantity);
-                        
-                        tbody.appendChild(tr);
-                        
-                        // Gera código de barras após adicionar ao DOM
-                        document.body.appendChild(pageContainer);
+                        row.insertCell(2).textContent = product.quantity.toFixed(2);
+                    }
+                    
+                    // Estiliza o clone para renderização
+                    clone.style.position = 'absolute';
+                    clone.style.left = '-9999px';
+                    clone.style.top = '0';
+                    clone.style.width = '1000px';
+                    clone.style.background = 'white';
+                    clone.style.padding = '40px';
+                    
+                    // Adiciona ao DOM temporariamente
+                    document.body.appendChild(clone);
+                    
+                    // Gera códigos de barras para os produtos desta página
+                    for (let i = startIdx; i < endIdx; i++) {
+                        const product = productsArray[i];
+                        const barcodeId = 'barcode-pdf-' + i + '-' + pageNum;
                         try {
                             JsBarcode(`#${barcodeId}`, getProductCode(product.name), {
                                 format: "CODE128",
@@ -724,37 +623,41 @@
                         } catch (e) {
                             console.error('Erro ao gerar código de barras:', e);
                         }
-                        document.body.removeChild(pageContainer);
                     }
                     
-                    table.appendChild(tbody);
-                    pageContainer.appendChild(table);
+                    // Aguarda um momento para garantir renderização
+                    await new Promise(resolve => setTimeout(resolve, 100));
                     
-                    // Adiciona ao DOM temporariamente
-                    document.body.appendChild(pageContainer);
-                    
-                    // Captura como imagem
-                    const canvas = await html2canvas(pageContainer, {
+                    // Captura o clone como imagem
+                    const canvas = await html2canvas(clone, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
                         backgroundColor: '#ffffff'
                     });
                     
-                    // Remove do DOM
-                    document.body.removeChild(pageContainer);
+                    // Remove o clone do DOM
+                    document.body.removeChild(clone);
                     
-                    // Adiciona ao PDF
+                    // Adiciona a imagem ao PDF
                     const imgData = canvas.toDataURL('image/png');
                     const imgWidth = pageWidth;
                     const imgHeight = (canvas.height * pageWidth) / canvas.width;
                     
-                    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    // Se a imagem for maior que a página, ajusta
+                    if (imgHeight > pageHeight) {
+                        const ratio = pageHeight / imgHeight;
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, pageHeight);
+                    } else {
+                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                    }
                 }
                 
                 // Gera nome do arquivo com data
-                const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
-                const filename = `produtos_${new Date().toISOString().split('T')[0]}_${timeStr}.pdf`;
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0];
+                const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+                const filename = `produtos_${dateStr}_${timeStr}.pdf`;
                 
                 // Salva o PDF
                 pdf.save(filename);
