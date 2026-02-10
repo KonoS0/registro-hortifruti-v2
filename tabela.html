@@ -524,10 +524,6 @@
             }
         }
 
-        function printTable() {
-            window.print();
-        }
-
         async function exportToPDF() {
             if (Object.keys(productData).length === 0) {
                 alert('Não há produtos para exportar!');
@@ -541,77 +537,153 @@
                 btnExport.value = 'Gerando PDF...';
                 btnExport.disabled = true;
 
-                // Aguarda um pequeno delay para garantir que os códigos de barras foram renderizados
+                // Aguarda os códigos de barras serem renderizados
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Obtém a tabela e data
-                const tableContainer = document.querySelector('.table-container');
                 const { jsPDF } = window.jspdf;
-
-                // Cria um clone da tabela para renderização
-                const clone = tableContainer.cloneNode(true);
-                
-                // Remove checkboxes e botões do clone
-                clone.querySelectorAll('.button-group').forEach(el => el.remove());
-                clone.querySelectorAll('.checkbox-cell').forEach(el => el.remove());
-                clone.querySelector('#selectAll')?.parentElement?.remove();
-                
-                // Ajusta estilo do clone para melhor renderização
-                clone.style.position = 'absolute';
-                clone.style.left = '-9999px';
-                clone.style.top = '0';
-                clone.style.width = '1000px';
-                clone.style.background = 'white';
-                clone.style.padding = '40px';
-                
-                document.body.appendChild(clone);
-
-                // Captura o elemento como imagem usando html2canvas
-                const canvas = await html2canvas(clone, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#ffffff'
-                });
-
-                // Remove o clone
-                document.body.removeChild(clone);
-
-                // Cria o PDF
-                const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                const imgWidth = 210; // Largura A4 em mm
-                const pageHeight = 297; // Altura A4 em mm
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-
-                // Adiciona primeira página
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-
-                // Adiciona páginas adicionais se necessário
-                while (heightLeft > 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                // Gera nome do arquivo com data
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const margin = 15;
+                const usableWidth = pageWidth - (2 * margin);
+                
+                // Configurações
+                const ITEMS_PER_PAGE = 8;
+                const headerHeight = 35;
+                const rowHeight = 28;
+                
+                // Obtém data atual
                 const now = new Date();
-                const dateStr = now.toISOString().split('T')[0];
+                const dateStr = now.toLocaleDateString('pt-BR', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                
+                // Converte produtos em array
+                const productsArray = Object.values(productData);
+                const totalPages = Math.ceil(productsArray.length / ITEMS_PER_PAGE);
+                
+                // Gera cada página
+                for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+                    if (pageNum > 0) {
+                        pdf.addPage();
+                    }
+                    
+                    let yPosition = margin;
+                    
+                    // Título
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Lista de Produtos Registrados', pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 8;
+                    
+                    // Data
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(dateStr, pageWidth / 2, yPosition, { align: 'center' });
+                    yPosition += 10;
+                    
+                    // Cabeçalho da tabela
+                    pdf.setFillColor(44, 62, 80);
+                    pdf.rect(margin, yPosition, usableWidth, 8, 'F');
+                    
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'bold');
+                    
+                    const colWidths = {
+                        produto: usableWidth * 0.50,
+                        tipo: usableWidth * 0.20,
+                        quantidade: usableWidth * 0.30
+                    };
+                    
+                    let xPos = margin + 2;
+                    pdf.text('Produto', xPos, yPosition + 6);
+                    xPos += colWidths.produto;
+                    pdf.text('Tipo', xPos, yPosition + 6);
+                    xPos += colWidths.tipo;
+                    pdf.text('Quantidade', xPos, yPosition + 6);
+                    
+                    yPosition += 8;
+                    pdf.setTextColor(0, 0, 0);
+                    pdf.setFont(undefined, 'normal');
+                    
+                    // Itens da página
+                    const startIdx = pageNum * ITEMS_PER_PAGE;
+                    const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, productsArray.length);
+                    
+                    for (let i = startIdx; i < endIdx; i++) {
+                        const product = productsArray[i];
+                        const isEven = (i - startIdx) % 2 === 0;
+                        
+                        // Fundo alternado
+                        if (isEven) {
+                            pdf.setFillColor(249, 249, 249);
+                            pdf.rect(margin, yPosition, usableWidth, rowHeight, 'F');
+                        }
+                        
+                        // Bordas
+                        pdf.setDrawColor(221, 221, 221);
+                        pdf.rect(margin, yPosition, usableWidth, rowHeight, 'S');
+                        
+                        // Nome do produto
+                        pdf.setFontSize(9);
+                        pdf.setFont(undefined, 'bold');
+                        xPos = margin + 2;
+                        pdf.text(product.name, xPos, yPosition + 6);
+                        
+                        // Código de barras
+                        const productCode = getProductCode(product.name);
+                        if (productCode && productCode !== 'NOCODE000000') {
+                            try {
+                                // Cria canvas temporário para o código de barras
+                                const canvas = document.createElement('canvas');
+                                JsBarcode(canvas, productCode, {
+                                    format: "CODE128",
+                                    width: 1,
+                                    height: 30,
+                                    displayValue: true,
+                                    fontSize: 8,
+                                    margin: 0
+                                });
+                                
+                                const barcodeImg = canvas.toDataURL('image/png');
+                                pdf.addImage(barcodeImg, 'PNG', xPos, yPosition + 8, 40, 15);
+                            } catch (e) {
+                                console.error('Erro ao gerar código de barras:', e);
+                            }
+                        }
+                        
+                        // Tipo
+                        pdf.setFont(undefined, 'normal');
+                        xPos = margin + 2 + colWidths.produto;
+                        pdf.text(product.type, xPos, yPosition + 14, { align: 'left' });
+                        
+                        // Quantidade
+                        xPos = margin + 2 + colWidths.produto + colWidths.tipo;
+                        pdf.text(product.quantity.toFixed(2), xPos, yPosition + 14, { align: 'left' });
+                        
+                        yPosition += rowHeight;
+                    }
+                    
+                    // Número da página no rodapé
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(128, 128, 128);
+                    pdf.text(`Página ${pageNum + 1} de ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                    pdf.setTextColor(0, 0, 0);
+                }
+                
+                // Gera nome do arquivo com data
                 const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-                const filename = `produtos_${dateStr}_${timeStr}.pdf`;
-
+                const filename = `produtos_${now.toISOString().split('T')[0]}_${timeStr}.pdf`;
+                
                 // Salva o PDF
                 pdf.save(filename);
-
+                
                 // Restaura o botão
                 btnExport.value = originalText;
                 btnExport.disabled = false;
-
+                
                 alert('PDF exportado com sucesso!');
             } catch (error) {
                 console.error('Erro ao exportar PDF:', error);
