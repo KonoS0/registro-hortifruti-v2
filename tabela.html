@@ -274,8 +274,7 @@
 
     <script>
         const products = [
-             // A lista de produtos original foi mantida aqui para gerar os códigos de barras
-             { code: "0067690", name: "ABACATE KG", type: "KG" },
+            { code: "0067690", name: "ABACATE KG", type: "KG" },
             { code: "0030441", name: "ABACAXI UN", type: "UN" },
             { code: "0067782", name: "ABOBORA ITALIANA KG", type: "KG" },
             { code: "0058735", name: "ABOBORA JACARE KG", type: "KG" },
@@ -284,18 +283,19 @@
             { code: "0328524", name: "ABOBRINHA JACAREZINHO REDONDA KG", type: "KG" },
             { code: "0046435", name: "ALHO GRANEL KG", type: "KG" },
             { code: "0068178", name: "AMEIXA IMPORTADA KG", type: "KG" },
-            { code: "0295666", name: "AMEIXA NACIONAL SM KG", type: "KG" },
+            { code: "0078979", name: "AMEIXA NACIONAL KG", type: "KG" },
             { code: "0067195", name: "BANANA CATURRA KG", type: "KG" },
             { code: "0067201", name: "BANANA MACA KG", type: "KG" },
             { code: "0028394", name: "BANANA OURO KG", type: "KG" },
             { code: "0067218", name: "BANANA PRATA KG", type: "KG" },
             { code: "0068147", name: "BANANA TERRA KG", type: "KG" },
-            { code: "0079143", name: "BATATA ASTERIX KG", type: "KG" },
             { code: "0037815", name: "BATATA DOCE BRANCA KG", type: "KG" },
             { code: "0067232", name: "BATATA DOCE ROXA KG", type: "KG" },
+            { code: "7898701660073", name: "BATATA INGLESA 2KG SQ", type: "SQ" },
             { code: "0067249", name: "BATATA INGLESA KG", type: "KG" },
             { code: "0067256", name: "BERINJELA KG", type: "KG" },
             { code: "0067263", name: "BETERRABA KG", type: "KG" },
+            { code: "0293990", name: "CAQUI RAMA FORTE KG", type: "KG" },
             { code: "0267557", name: "CARA BARBADOS KG", type: "KG" },
             { code: "0067331", name: "CARA/INHAME KG", type: "KG" },
             { code: "0067416", name: "CEBOLA AMARELA KG", type: "KG" },
@@ -310,40 +310,66 @@
             { code: "0004060", name: "GRAVIOLA KG", type: "KG" },
             { code: "0001250", name: "JILO KG", type: "KG" },
             { code: "0001274", name: "KIWI IMPORTADO KG", type: "KG" },
-            { code: "0001366", name: "LARANJA BAHIA KG", type: "KG" },
             { code: "0595360", name: "LARANJA BAHIA IMPORTADA KG", type: "KG" },
+            { code: "0001366", name: "LARANJA BAHIA KG", type: "KG" },
             { code: "0290913", name: "LARANJA LIMA KG", type: "KG" },
-            { code: "0064453", name: "LARANJA LIMA DA PERSIA KG", type: "KG" },
+            { code: "0064453", name: "LARANJA LIMA PERSIA KG", type: "KG" },
             { code: "0001373", name: "LARANJA PERA RIO KG", type: "KG" },
             { code: "0001397", name: "LIMAO KG", type: "KG" },
             { code: "0203715", name: "LIMAO SICILIANO KG", type: "KG" },
             { code: "0001885", name: "MACA ARGENTINA/CHILENA KG", type: "KG" },
             { code: "0065191", name: "MACA GRAN SMITH KG", type: "KG" },
             { code: "0001908", name: "MACA NACIONAL FUJI KG", type: "KG" },
+            { code: "7896132200509", name: "MACA NACIONAL GALA 1KG PT", type: "PT" },
+            { code: "7898642650010", name: "MACA NACIONAL GALA 850G PT", type: "PT" },
             { code: "0001915", name: "MACA NACIONAL GALA KG", type: "KG" },
-            { code: "0275477", name: "MACA PINK LADY KG", type: "KG" },
+            { code: "0025477", name: "MACA PINK LADY KG", type: "KG" },
             { code: "0001939", name: "MAMAO FORMOSO KG", type: "KG" },
             { code: "0001946", name: "MAMAO HAVAI KG", type: "KG" },
             { code: "0001960", name: "MANDIOCA KG", type: "KG" },
             { code: "0064347", name: "MANGA ESPADA KG", type: "KG" },
             { code: "0008761", name: "MANGA PALMER KG", type: "KG" },
             { code: "0291361", name: "MANGA ROSA KG", type: "KG" },
-            { code: "0001977", name: "MANGA TOMY KG", type: "KG" },
-            { code: "0316842", name: "MANGUITA KG", type: "KG" },
+            { code: "0001977", name: "MANGA TOMMY KG", type: "KG" },
             { code: "0001984", name: "MARACUJA AZEDO KG", type: "KG" },
             { code: "0809092", name: "MELANCIA BABY KG", type: "KG" },
             { code: "0002011", name: "MELANCIA KG", type: "KG" },
             { code: "0272087", name: "MELANCIA PINGO DOCE KG", type: "KG" },
             { code: "0002028", name: "MELAO AMARELO KG", type: "KG" },
             { code: "0329217", name: "MELAO DINO KG", type: "KG" },
-            { code: "0014540", name: "MELAO ORANGE KG", type: "KG" },
             { code: "0643269", name: "MELAO PELE SAPO KG", type: "KG" },
             { code: "0212403", name: "MELAO REY KG", type: "KG" },
             { code: "0035033", name: "MEXERICA CARIOCA KG", type: "KG" },
             { code: "0056106", name: "MEXERICA MURCOTE KG", type: "KG" },
             { code: "0002035", name: "MEXERICA PONKAN KG", type: "KG" },
+            { code: "7898374350011", name: "MILHO VERDE 650G BJ", type: "BJ" },
             { code: "1318241", name: "MILHO VERDE ESPIGA UN", type: "UN" },
             { code: "0079419", name: "NECTARINA NACIONAL KG", type: "KG" },
+            { code: "7896292900523", name: "OVOS BCOS.C/12 BJ", type: "BJ" },
+            { code: "7897542820226", name: "OVOS BCOS.IANA EXTRA C/20 BJ", type: "BJ" },
+            { code: "7897542830638", name: "OVOS BCOS.IANA EXTRA C/30 BJ", type: "BJ" },
+            { code: "7897542830614", name: "OVOS BCOS.IANA GDE.C/12 BJ", type: "BJ" },
+            { code: "7897542800037", name: "OVOS BCOS.IANA GDE.C/30 BJ", type: "BJ" },
+            { code: "7897542830393", name: "OVOS BCOS.IANA GOURMET GDE.C/10 BJ", type: "BJ" },
+            { code: "7897542830188", name: "OVOS BCOS.IANA KING EGGS JUMBO C/10 BJ", type: "BJ" },
+            { code: "7898296880832", name: "OVOS BCOS.LIVA EXTRA C/30 BJ", type: "BJ" },
+            { code: "7898296880016", name: "OVOS BCOS.LIVA GDE.C/30 BJ", type: "BJ" },
+            { code: "7898296880092", name: "OVOS BCOS.LIVA JUMBO C/20 BJ", type: "BJ" },
+            { code: "7898006890601", name: "OVOS BCOS.POMMER GDE.C/20 BJ", type: "BJ" },
+            { code: "7898006890557", name: "OVOS BCOS.POMMER GDE.C/30 BJ", type: "BJ" },
+            { code: "7898067740709", name: "OVOS BCOS.STA.MARIA GDE.C/20 BJ", type: "BJ" },
+            { code: "7898067740082", name: "OVOS BCOS.STA.MARIA GDE.C/30 BJ", type: "BJ" },
+            { code: "7898405740958", name: "OVOS CAIPIRA FAZENDA TOCA ORG.LIBER.C/20 UN", type: "BJ" },
+            { code: "3986170", name: "OVOS CAIPIRA SERRA DO MAR C/12 BJ", type: "BJ" },
+            { code: "7897026290019", name: "OVOS CODORNA C/30 BJ", type: "BJ" },
+            { code: "7898105591133", name: "OVOS CODORNA CARAMURU C/30 BJ", type: "BJ" },
+            { code: "7898958911997", name: "OVOS CODORNA IANA C/30 BJ", type: "BJ" },
+            { code: "7898908032024", name: "OVOS VERM.C/12 BJ", type: "BJ" },
+            { code: "7897542830607", name: "OVOS VERM.IANA EXTRA C/30 BJ", type: "BJ" },
+            { code: "7897542830621", name: "OVOS VERM.IANA GDE.C/12 BJ", type: "BJ" },
+            { code: "7897542800396", name: "OVOS VERM.IANA OMEGA 3 GDE.C/10 BJ", type: "BJ" },
+            { code: "7897542830423", name: "OVOS VERM.IANA SELE/OMEGA 3 C/10 BJ", type: "BJ" },
+            { code: "7897542830416", name: "OVOS VERM.IANA SELENIO GDE.C/10 BJ", type: "BJ" },
             { code: "0291996", name: "PEPINO JAPONES KG", type: "KG" },
             { code: "0002448", name: "PEPINO KG", type: "KG" },
             { code: "0707916", name: "PERA D'ANJOU KG", type: "KG" },
@@ -353,81 +379,22 @@
             { code: "0003773", name: "PESSEGO NACIONAL KG", type: "KG" },
             { code: "0199933", name: "PIMENTAO AMARELO/VERMELHO KG", type: "KG" },
             { code: "0002530", name: "PIMENTAO VERDE KG", type: "KG" },
-            { code: "0256643", name: "PITAIA KG", type: "KG" },
-            { code: "0003315", name: "QUIABO KG", type: "KG" },
             { code: "0003360", name: "REPOLHO ROXO KG", type: "KG" },
             { code: "0003353", name: "REPOLHO VERDE KG", type: "KG" },
             { code: "0071314", name: "TOMATE ITALIANO ANDREA KG", type: "KG" },
             { code: "0064248", name: "TOMATE LONGA VIDA KG", type: "KG" },
-            { code: "0003681", name: "VAGEM KG", type: "KG" },
-            { code: "0018425", name: "ROMA KG", type: "KG" },
-            { code: "301804", name: "UVA BEMFRUTI PTA,C/SEMENTE 500G BJ", type: "UN" },
-            { code: "327194", name: "UVA BEMFRUTI ROSADA C/SEM.500G BJ", type: "UN" },
-            { code: "301806", name: "UVA BEMFRUTI VDE.C/SEMENTE 500G BJ", type: "UN" },
-            { code: "301808", name: "UVA BEMFRUTI VDE,S/SEMENTE 500G BJ", type: "UN" },
-            { code: "301809", name: "UVA BEMFRUTI VERM.C/SEMENTE 500G BJ", type: "UN" },
-            { code: "301810", name: "UVA BEMFRUTI VERM.S/SEMENTE 500G BJ", type: "UN" },
-            { code: "301811", name: "UVA BEMFRUTI VITORIA S/SEM.500G BJ", type: "UN" },
-            { code: "0279475", name: "UVA BENITAKA KG", type: "KG" },
-            { code: "0639606", name: "UVA CRIMSON 500G BJ", type: "UN" },
-            { code: "0827768", name: "UVA CRIMSON KG", type: "KG" },
-            { code: "0715591", name: "UVA CRIMSON S/SEMENTE 500G BJ", type: "UN" },
-            { code: "0360036", name: "UVA ISIS KG", type: "KG" },
-            { code: "3252", name: "UVA ITALIA 500G BJ", type: "UN" },
-            { code: "0003650", name: "UVA ITALIA KG", type: "KG" },
-            { code: "0362399", name: "UVA JUBILE KG", type: "KG" },
-            { code: "0616041", name: "UVA MOSCATEL KG", type: "KG" },
-            { code: "0003667", name: "UVA PASSA BRANCA S/S.KG", type: "KG" },
-            { code: "0363075", name: "UVA PASSAS BRANCA KG", type: "KG" },
-            { code: "0364775", name: "UVA PASSAS ESC POTE KG", type: "KG" },
-            { code: "0362788", name: "UVA PASSAS PRETA S/CAR GRANEL KG", type: "KG" },
-            { code: "0364508", name: "UVA PASSAS PTA S KG", type: "KG" },
-            { code: "79656", name: "UVA RED GLOBE 500G BJ", type: "UN" },
-            { code: "0005302", name: "UVA RED GLOBE KG", type: "KG" },
-            { code: "2361116", name: "UVA ROSADA 500G BJ", type: "UN" },
-            { code: "0064408", name: "UVA ROSADA KG", type: "KG" },
-            { code: "0366090", name: "UVA ROSADA NIAGARA CX PEQ UN", type: "UN" },
-            { code: "2552897", name: "UVA ROSADA NIAGARA 500G BDJ", type: "BDJ" },
-            { code: "0003674", name: "UVA RUBI KG", type: "KG" },
-            { code: "69920", name: "UVA THOMPSON 500G BJ", type: "UN" },
-            { code: "0005357", name: "UVA THOMPSON KG", type: "KG" },
-            { code: "0359542", name: "UVA THOMPSON S/CAROCO 500 GR", type: "GR" },
-            { code: "148334", name: "UVA VITORIA 500G BJ", type: "UN" },
-            { code: "0292900", name: "UVA VITORIA KG", type: "KG" },
-            { code: "287923", name: "OVOS BCOS.C/12 BJ", type: "UN" },
-            { code: "131132", name: "OVOS BCOS.IANA EXTRA C/20 BJ", type: "UN" },
-            { code: "326184", name: "OVOS BCOS.IANA EXTRA C/30 BJ", type: "UN" },
-            { code: "131133", name: "OVOS BCOS.IANA GDE.C/12 BJ", type: "UN" },
-            { code: "130962", name: "OVOS BCOS.IANA GDE.C/30 BJ", type: "UN" },
-            { code: "327217", name: "OVOS BCOS.IANA KING EGGS JUMBO C/10 BJ", type: "UN" },
-            { code: "333463", name: "OVOS BCOS.JETIBA EXTRA C/30 BJ", type: "UN" },
-            { code: "285332", name: "OVOS BCOS.KEROVOS GDE.C/12 BJ", type: "UN" },
-            { code: "7896292900523", name: "OVOS BCOS C/12 BJ", type: "UN" },
-            { code: "7897542820226", name: "OVOS BCOS IANA EXTRA C/20 BJ", type: "UN" },
-            { code: "7897542830638", name: "OVOS BCOS IANA EXTRA C/30 BJ", type: "UN" },
-            { code: "7897542830614", name: "OVOS BCOS IANA GDE C/12 BJ", type: "UN" },
-            { code: "7897542800037", name: "OVOS BCOS IANA GDE C/30 BJ", type: "UN" },
-            { code: "7897542830188", name: "OVOS BCOS IANA KING EGGS JUMBO C/10 BJ", type: "UN" },
-            { code: "7898270630118", name: "OVOS BCOS JETIBA EXTRA C/30 BJ", type: "UN" },
-            { code: "7897967900015", name: "OVOS BCOS KEROVOS GDE C/12 BJ", type: "UN" },
-            { code: "7898296880832", name: "OVOS BCOS LIVA EXTRA C/30 BJ", type: "UN" },
-            { code: "7898296880016", name: "OVOS BCOS LIVA GDE C/30 BJ", type: "UN" },
-            { code: "7898296880092", name: "OVOS BCOS LIVA JUMBO C/20 BJ", type: "UN" },
-            { code: "7898006890601", name: "OVOS BCOS POMMER GDE C/20 BJ", type: "UN" },
-            { code: "7898006890557", name: "OVOS BCOS POMMER GDE C/30 BJ", type: "UN" },
-            { code: "7898067740709", name: "OVOS BCOS STA MARIA GDE C/20 BJ", type: "UN" },
-            { code: "7898067740082", name: "OVOS BCOS STA MARIA GDE C/30 BJ", type: "UN" },
-            { code: "7898994511915", name: "OVOS CAIPIRA C/12 BJ", type: "UN" },
-            { code: "7898405740958", name: "OVOS CAIPIRA FAZENDA TOCA ORG LIBER C/20 UN", type: "UN" },
-            { code: "7898366170627", name: "OVOS CAIPIRA GL EXTRA C/12 BJ", type: "UN" },
-            { code: "0609963986170", name: "OVOS CAIPIRA SERRA DO MAR C/12 BJ", type: "UN" },
-            { code: "7897026290019", name: "OVOS CODORNA C/30 BJ", type: "UN" },
-            { code: "7898105591133", name: "OVOS CODORNA CARAMURU C/30 BJ", type: "UN" },
-            { code: "7898958911997", name: "OVOS CODORNA IANA C/30 BJ", type: "UN" },
-            { code: "7897967900091", name: "OVOS CODORNA KEROVOS C/30 BJ", type: "UN" },
-            { code: "7898908032024", name: "OVOS VERM C/12 BJ", type: "UN" },
-            { code: "7897542830607", name: "OVOS VERM IANA EXTRA C/30 BJ", type: "UN" },
-            { code: "7897542830621", name: "OVOS VERM IANA GDE C/12 BJ", type: "UN" },
+            { code: "7898948440036", name: "TOMATE SWEET GRAPE 250G BJ", type: "BJ" },
+            { code: "7898701660806", name: "UVA BEMFRUTI PTA.C/SEMENTE 500G BJ", type: "BJ" },
+            { code: "7898701661018", name: "UVA BEMFRUTI ROSA C/SEM.500G BJ", type: "BJ" },
+            { code: "7898701660752", name: "UVA BEMFRUTI VDE.C/SEMENTE 500G BJ", type: "BJ" },
+            { code: "7898701660745", name: "UVA BEMFRUTI VDE.S/SEMENTE 500G BJ", type: "BJ" },
+            { code: "7898701660769", name: "UVA BEMFRUTI VERM.C/SEMENTE 500G BJ", type: "BJ" },
+            { code: "7898701660776", name: "UVA BEMFRUTI VERM.S/SEMENTE 500G BJ", type: "BJ" },
+            { code: "7898701660790", name: "UVA BEMFRUTI VITORIA S/SEM.500G BJ", type: "BJ" },
+            { code: "7898703000464", name: "UVA CRIMSON 500G BJ", type: "BJ" },
+            { code: "7898949642009", name: "UVA ITALIA 500G BJ", type: "BJ" },
+            { code: "7898949747932", name: "UVA THOMPSON 500G BJ", type: "BJ" },
+            { code: "7898949747949", name: "UVA VITORIA 500G BJ", type: "BJ" }
         ];
 
         let productData = {};
@@ -542,25 +509,25 @@
 
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                
+
                 const pageWidth = 210;
                 const pageHeight = 297;
-                
+
                 // Converte produtos em array
                 const productsArray = Object.values(productData);
-                const ITEMS_PER_PAGE = 8;
+                const ITEMS_PER_PAGE = 15; // Mais itens por página = menos páginas = PDF menor
                 const totalPages = Math.ceil(productsArray.length / ITEMS_PER_PAGE);
-                
+
                 // Para cada página, cria uma versão da tabela com apenas os itens daquela página
                 for (let pageNum = 0; pageNum < totalPages; pageNum++) {
                     if (pageNum > 0) {
                         pdf.addPage();
                     }
-                    
+
                     // Clona o container original
                     const tableContainer = document.querySelector('.table-container');
                     const clone = tableContainer.cloneNode(true);
-                    
+
                     // Remove botões e checkboxes do clone
                     clone.querySelectorAll('.button-group').forEach(el => el.remove());
                     clone.querySelectorAll('.checkbox-cell').forEach(el => el.remove());
@@ -568,19 +535,19 @@
                     if (selectAllHeader) {
                         selectAllHeader.parentElement.remove();
                     }
-                    
+
                     // Limpa o tbody do clone
                     const tbody = clone.querySelector('#tableBody');
                     tbody.innerHTML = '';
-                    
+
                     // Adiciona apenas os produtos desta página
                     const startIdx = pageNum * ITEMS_PER_PAGE;
                     const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, productsArray.length);
-                    
+
                     for (let i = startIdx; i < endIdx; i++) {
                         const product = productsArray[i];
                         const row = tbody.insertRow();
-                        
+
                         // Célula do produto
                         const barcodeId = 'barcode-pdf-' + i + '-' + pageNum;
                         row.insertCell(0).innerHTML = `
@@ -588,26 +555,26 @@
                                 <span class="product-name">${product.name}</span>
                                 <div class="barcode-container"><svg id="${barcodeId}"></svg></div>
                             </div>`;
-                        
+
                         // Célula do tipo
                         row.insertCell(1).textContent = product.type;
-                        
+
                         // Célula da quantidade
                         row.insertCell(2).textContent = product.quantity.toFixed(2);
                     }
-                    
+
                     // Estiliza o clone para renderização
                     clone.style.position = 'absolute';
                     clone.style.left = '-9999px';
                     clone.style.top = '0';
-                    clone.style.width = '1000px';
+                    clone.style.width = '800px'; // Largura menor = imagem menor
                     clone.style.background = 'white';
-                    clone.style.padding = '40px';
-                    
+                    clone.style.padding = '20px';
+
                     // Adiciona ao DOM temporariamente
                     document.body.appendChild(clone);
-                    
-                    // Gera códigos de barras para os produtos desta página
+
+                    // Gera códigos de barras compactos para os produtos desta página
                     for (let i = startIdx; i < endIdx; i++) {
                         const product = productsArray[i];
                         const barcodeId = 'barcode-pdf-' + i + '-' + pageNum;
@@ -615,62 +582,62 @@
                             JsBarcode(`#${barcodeId}`, getProductCode(product.name), {
                                 format: "CODE128",
                                 width: 1,
-                                height: 40,
+                                height: 28, // Barcode menor
                                 displayValue: true,
-                                fontSize: 10,
-                                margin: 2
+                                fontSize: 8,
+                                margin: 1
                             });
                         } catch (e) {
                             console.error('Erro ao gerar código de barras:', e);
                         }
                     }
-                    
+
                     // Aguarda um momento para garantir renderização
                     await new Promise(resolve => setTimeout(resolve, 100));
-                    
-                    // Captura o clone como imagem
+
+                    // Captura o clone como imagem com scale reduzido
                     const canvas = await html2canvas(clone, {
-                        scale: 2,
+                        scale: 1, // Scale 1 em vez de 2 = 4x menos pixels = muito menor
                         useCORS: true,
                         logging: false,
                         backgroundColor: '#ffffff'
                     });
-                    
+
                     // Remove o clone do DOM
                     document.body.removeChild(clone);
-                    
-                    // Adiciona a imagem ao PDF
-                    const imgData = canvas.toDataURL('image/png');
+
+                    // Converte para JPEG com compressão em vez de PNG
+                    const imgData = canvas.toDataURL('image/jpeg', 0.7); // JPEG 70% = muito menor que PNG
                     const imgWidth = pageWidth;
                     const imgHeight = (canvas.height * pageWidth) / canvas.width;
-                    
+
                     // Se a imagem for maior que a página, ajusta
                     if (imgHeight > pageHeight) {
                         const ratio = pageHeight / imgHeight;
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, pageHeight);
+                        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth * ratio, pageHeight);
                     } else {
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
                     }
                 }
-                
+
                 // Gera nome do arquivo com data
                 const now = new Date();
                 const dateStr = now.toISOString().split('T')[0];
                 const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
                 const filename = `produtos_${dateStr}_${timeStr}.pdf`;
-                
+
                 // Salva o PDF
                 pdf.save(filename);
-                
+
                 // Restaura o botão
                 btnExport.value = originalText;
                 btnExport.disabled = false;
-                
+
                 alert('PDF exportado com sucesso!');
             } catch (error) {
                 console.error('Erro ao exportar PDF:', error);
                 alert('Erro ao gerar PDF. Por favor, tente novamente.');
-                
+
                 // Restaura o botão em caso de erro
                 const btnExport = document.getElementById('btnExportPDF');
                 btnExport.value = 'Exportar PDF';
