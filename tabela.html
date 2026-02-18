@@ -515,7 +515,7 @@
 
                 // Converte produtos em array
                 const productsArray = Object.values(productData);
-                const ITEMS_PER_PAGE = 15; // Mais itens por página = menos páginas = PDF menor
+                const ITEMS_PER_PAGE = 20; // Mais itens por página = menos páginas = PDF muito menor
                 const totalPages = Math.ceil(productsArray.length / ITEMS_PER_PAGE);
 
                 // Para cada página, cria uma versão da tabela com apenas os itens daquela página
@@ -567,7 +567,7 @@
                     clone.style.position = 'absolute';
                     clone.style.left = '-9999px';
                     clone.style.top = '0';
-                    clone.style.width = '800px'; // Largura menor = imagem menor
+                    clone.style.width = '600px'; // Largura menor = imagem menor
                     clone.style.background = 'white';
                     clone.style.padding = '20px';
 
@@ -597,7 +597,7 @@
 
                     // Captura o clone como imagem com scale reduzido
                     const canvas = await html2canvas(clone, {
-                        scale: 1, // Scale 1 em vez de 2 = 4x menos pixels = muito menor
+                        scale: 0.8, // Scale 0.8 = menor ainda, mas legível
                         useCORS: true,
                         logging: false,
                         backgroundColor: '#ffffff'
@@ -607,7 +607,7 @@
                     document.body.removeChild(clone);
 
                     // Converte para JPEG com compressão em vez de PNG
-                    const imgData = canvas.toDataURL('image/jpeg', 0.7); // JPEG 70% = muito menor que PNG
+                    const imgData = canvas.toDataURL('image/jpeg', 0.6); // JPEG 60% = muito mais leve
                     const imgWidth = pageWidth;
                     const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
