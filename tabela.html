@@ -177,6 +177,81 @@
             height: auto;
         }
 
+        .classification-buttons { 
+            display: inline-flex; 
+            gap: 4px; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        .btn-classification { 
+            padding: 4px 10px; 
+            font-size: 10px; 
+            font-weight: 700;
+            border: 2px solid #ccc; 
+            background: white; 
+            cursor: pointer; 
+            border-radius: 4px;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            min-width: 32px;
+        }
+        
+        .btn-classification:hover { 
+            background: #f5f5f5;
+            transform: translateY(-1px);
+            border-color: #999;
+        }
+        
+        .btn-classification:active {
+            transform: translateY(0);
+        }
+        
+        .btn-classification.active-nt { 
+            background: #27ae60; 
+            color: white; 
+            border-color: #229954;
+            box-shadow: 0 2px 4px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-classification.active-nt:hover {
+            background: #229954;
+            border-color: #1e8449;
+        }
+        
+        .btn-classification.active-qb { 
+            background: #c0392b; 
+            color: white; 
+            border-color: #a93226;
+            box-shadow: 0 2px 4px rgba(192, 57, 43, 0.3);
+        }
+        
+        .btn-classification.active-qb:hover {
+            background: #a93226;
+            border-color: #922b21;
+        }
+
+        .classification-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-nt {
+            background: #d4edda;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .badge-qb {
+            background: #f8d7da;
+            color: #c0392b;
+            border: 1px solid #c0392b;
+        }
+
         @media (max-width: 768px) {
             .table-container {
                 padding: 20px;
@@ -205,37 +280,55 @@
         }
 
         @media print {
-            .button-group, .checkbox-cell, #selectAll {
-                display: none;
-            }
-            .table-container {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-                max-width: none;
-                width: 100%;
-            }
-            .barcode-container svg {
-                width: 100%; 
-                max-width: 250px; 
-                height: auto;
-            }
-            th, td {
-                color: #2c3e50;
-                padding: 8px 10px;
-                text-align: center;
-            }
-            th { background-color: #ccc !important; }
-            tr:nth-child(even) { background-color: #f0f0f0 !important; }
-        }
-
-        @media print {
             body { background: white; padding: 0; }
             .button-group, .checkbox-cell, #selectAll { display: none !important; }
-            .table-container { box-shadow: none; border: none; width: 100%; }
+            .table-container { 
+                box-shadow: none; 
+                border: none; 
+                width: 100%; 
+                padding: 20px;
+            }
+            
+            /* Esconder os botões de classificação na impressão */
+            .btn-classification {
+                display: none !important;
+            }
+            
+            /* Mostrar o texto de classificação na impressão junto com a quantidade */
+            .classification-print-text {
+                display: inline !important;
+                font-weight: bold;
+                font-size: 10px;
+            }
+            
+            /* Estilos para impressão em preto e branco */
+            th, td {
+                color: black !important;
+                padding: 8px 10px;
+                text-align: center;
+                border: 1px solid #333 !important;
+            }
+            
+            th { 
+                background-color: #ddd !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            tr:nth-child(even) { 
+                background-color: #f5f5f5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .barcode-container svg {
+                width: 100%; 
+                max-width: 200px; 
+                height: auto;
+            }
 
             tr {
-                page-break-inside: avoid; /* Evita cortar um item ao meio */
+                page-break-inside: avoid;
             }
 
             .page-break {
@@ -439,7 +532,11 @@
 
             Object.values(productData).forEach(product => {
                 const row = tbody.insertRow();
-                row.insertCell(0).innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${product.name}">`;
+                
+                // Usar apenas o nome do produto como chave
+                const productKey = product.name;
+                
+                row.insertCell(0).innerHTML = `<input type="checkbox" class="row-checkbox" data-product="${productKey}">`;
                 row.cells[0].className = 'checkbox-cell';
 
                 const barcodeId = 'barcode-' + product.name.replace(/\W/g, '');
@@ -450,7 +547,35 @@
                     </div>`;
 
                 row.insertCell(2).textContent = product.type;
-                row.insertCell(3).textContent = product.quantity.toFixed(2);
+                
+                // Célula de quantidade com botões de classificação abaixo
+                const quantityCell = row.insertCell(3);
+                const currentClass = product.classification || '';
+                
+                // Escapar o nome do produto para uso no onclick
+                const escapedProductKey = productKey.replace(/'/g, "\\'");
+                
+                // Define o texto para impressão
+                let printText = '';
+                if (currentClass === 'NT') {
+                    printText = ' [NT]';
+                } else if (currentClass === 'QB') {
+                    printText = ' [QB]';
+                }
+                
+                quantityCell.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                        <span class="quantity-value" style="font-weight: 500; font-size: 14px;">${product.quantity.toFixed(2)}<span class="classification-print-text" style="display: none;">${printText}</span></span>
+                        <div class="classification-buttons" style="display: flex; gap: 4px;">
+                            <button class="btn-classification ${currentClass === 'NT' ? 'active-nt' : ''}" 
+                                    onclick="toggleClassification('${escapedProductKey}', 'NT')" 
+                                    title="${currentClass === 'NT' ? 'Clique para desmarcar Nota de Devolução' : 'Marcar como Nota de Devolução'}">NT</button>
+                            <button class="btn-classification ${currentClass === 'QB' ? 'active-qb' : ''}" 
+                                    onclick="toggleClassification('${escapedProductKey}', 'QB')" 
+                                    title="${currentClass === 'QB' ? 'Clique para desmarcar Quebra' : 'Marcar como Quebra'}">QB</button>
+                        </div>
+                    </div>
+                `;
 
                 setTimeout(() => {
                     try {
@@ -464,6 +589,31 @@
 
         function toggleSelectAll() {
             document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = document.getElementById('selectAll').checked);
+        }
+
+        function toggleClassification(productKey, classification) {
+            console.log('Toggle classification:', productKey, classification);
+            console.log('Product data before:', productData[productKey]);
+            
+            if (!productData[productKey]) {
+                console.error('Produto não encontrado:', productKey);
+                return;
+            }
+            
+            // Se já está marcado com essa classificação, remove
+            if (productData[productKey].classification === classification) {
+                console.log('Removendo classificação:', classification);
+                delete productData[productKey].classification;
+            } else {
+                // Caso contrário, marca com a nova classificação
+                console.log('Adicionando classificação:', classification);
+                productData[productKey].classification = classification;
+            }
+            
+            console.log('Product data after:', productData[productKey]);
+            
+            saveProducts();
+            updateTable();
         }
 
         function deleteSelected() {
@@ -561,6 +711,16 @@
 
                         // Célula da quantidade
                         row.insertCell(2).textContent = product.quantity.toFixed(2);
+                        
+                        // Célula da classificação
+                        const classCell = row.insertCell(3);
+                        if (product.classification === 'NT') {
+                            classCell.innerHTML = '<span class="classification-badge badge-nt">NT</span>';
+                        } else if (product.classification === 'QB') {
+                            classCell.innerHTML = '<span class="classification-badge badge-qb">QB</span>';
+                        } else {
+                            classCell.textContent = '-';
+                        }
                     }
 
                     // Estiliza o clone para renderização
